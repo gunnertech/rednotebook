@@ -21,13 +21,17 @@ import bcrypt from 'bcrypt-nodejs';
 let userSchema = mongoose.Schema({
 
   local : {
-
     username : { type : String, unique : true },
 
     password : String,
 
     email : { type : String, unique : true }
   },
+
+  state: [{type: mongoose.Schema.Types.ObjectId, ref:'State'}],
+  assignments: [{type: mongoose.Schema.Types.ObjectId, ref:'Assignment'}],
+  responses: [{type: mongoose.Schema.Types.ObjectId, ref:'Response'}],
+  notifications: [{type: mongoose.Schema.Types.ObjectId, ref:'Notification'}],
 
   role : { type : String }
 });
