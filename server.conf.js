@@ -39,6 +39,8 @@ let server = http.createServer(app);
 let io = socketio.listen(server);
 // Load Mongoose for MongoDB interactions
 import mongoose from 'mongoose';
+import Promise from 'bluebird';
+mongoose.Promise = Promise;
 // Log requests to the console (Express 4)
 import morgan from 'morgan';
 // Pull information from HTML POST (express 4)
@@ -93,6 +95,61 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('X-HTTP-Method-Override'));
 // Set the static files location /public/img will be /img for users
 app.use(express.static(__dirname + '/dist'));
+
+import Notebook from './app/models/notebook.model';
+import Part from './app/models/part.model';
+import User from './app/models/user.model';
+
+User.findOne({'local.email': 'dougwett@gmail.com'})
+.then( (user) => {
+	if(!user) {
+		let newUser = new User();
+		newUser.role = 'admin';
+		newUser.local.username = "dougj".toLowerCase();
+		newUser.local.email = "dougwett@gmail.com".toLowerCase();
+		newUser.local.password = newUser.generateHash(process.env.adminPassword || "Changemenowplease1!!");
+
+		return newUser.save();
+	} else {
+		return user;
+	}
+})
+
+
+
+Notebook.count()
+.then((count) => {
+	if(count === 0) {
+		return Notebook.create({});
+	} else {
+		return Notebook.findOne({}).populate('parts');
+	}
+})
+.then((notebook) => {
+	if(notebook.parts.length === 0) {
+		let parts = [
+			{title: "Folder", position: 1},
+			{title: "Part 1", position: 2},
+			{title: "Part 2", position: 3},
+			{title: "Part 3", position: 4},
+		];
+
+		return Promise.each(parts, (part) => {
+			part.notebook = notebook._id;
+			return Part.create(part)
+			.then(function(part) {
+				notebook.parts.push(part);
+				return notebook.save(); 
+			});
+		});
+	} else {
+		return Part.find({notebook: notebook});
+	}
+})
+.then( ()=> {
+	// console.log(arguments);
+})
+;
 
 // ## Passport JS
 

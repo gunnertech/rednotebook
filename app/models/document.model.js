@@ -8,8 +8,14 @@ let documentSchema = new mongoose.Schema({
 		get: v => Math.round(v),
 		set: v => Math.round(v)
 	},
-	section: {type: mongoose.Schema.Types.ObjectId, ref: 'Section'},
-	states: [{type: mongoose.Schema.Types.ObjectId, ref:'State'}],
+	part: {type: mongoose.Schema.Types.ObjectId, ref: 'Part'},
+	sections: [{type: mongoose.Schema.Types.ObjectId, ref: 'Section'}],
+	state: {type: mongoose.Schema.Types.ObjectId, ref:'State'},
+	isOngoing: {
+		type: Boolean,
+		required: true,
+		default: false
+	},
   assignments: [{type: mongoose.Schema.Types.ObjectId, ref:'Assignment'}]
 });
 

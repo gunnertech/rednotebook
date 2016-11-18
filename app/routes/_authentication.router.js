@@ -91,7 +91,6 @@ export default (app, router, passport, auth, admin) => {
     // exception occured, `err` will be set. `info` contains a message
     // set within the Local Passport strategy.
     passport.authenticate('local-signup', (err, user, info) => {
-
       if (err)
         return next(err);
 

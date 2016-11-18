@@ -16,6 +16,7 @@ import authRoutes from './routes/_authentication.router.js';
 
 // Load our API routes for the `todo` component
 import todoRoutes from './routes/_todo.router.js';
+import partRoutes from './routes/_part.router.js';
 
 // Load our API routes for the `recipe` component
 import recipeRoutes from './routes/_recipe.router.js';
@@ -34,6 +35,7 @@ export default (app, router, passport) => {
   // Define a middleware function to be used for all secured routes
   let auth = (req, res, next) => {
 
+    console.log("LETS SEEE")
     if (!req.isAuthenticated())
       res.send(401);
 
@@ -66,6 +68,7 @@ export default (app, router, passport) => {
 
   // Pass in our Express app and Router
   todoRoutes(app, router);
+  partRoutes(app, router, auth, admin);
 
 	recipeRoutes(app, router);
 

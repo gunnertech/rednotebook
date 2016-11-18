@@ -2,10 +2,11 @@ import mongoose from 'mongoose';
 
 let inputSchema = new mongoose.Schema({
 	label: { type: String },
+	placeholder: { type: String },
 	description: { type: String },
 	dataType: { 
 		type: String,
-		enum: ["File", "Short Text", "Number", "Percentage", "Long Text"]
+		enum: ["File", "Short Text", "Number", "Percentage", "Long Text", "Date"]
 	},
 	choices: {
 		type: [String]

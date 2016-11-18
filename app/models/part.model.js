@@ -1,4 +1,5 @@
-import mongoose from '../models/mongoose';
+import mongoose from 'mongoose';
+import Document from './document.model';
 
 let partSchema = new mongoose.Schema({
 	title: {

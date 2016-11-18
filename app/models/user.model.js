@@ -36,6 +36,19 @@ let userSchema = mongoose.Schema({
   role : { type : String }
 });
 
+userSchema.pre('save', function (next) {
+  var self = this;
+  console.log(this);
+  mongoose.model('User', userSchema).count({})
+  .then(function (count) {
+    if(count === 0) {
+      self.role = 'admin';
+    }
+
+    next();
+  });
+});
+
 // ## Methods
 
 // ### Generate a hash

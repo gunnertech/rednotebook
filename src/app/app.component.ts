@@ -31,6 +31,9 @@ import {Todo} from './todo/todo.component';
 // Import Recipes component
 import {Recipes} from './recipes/recipes.component';
 
+// Import Notebooks component
+import {Notebooks} from './notebooks/notebooks.component';
+
 /*
  * App Component
  * Top Level Component
@@ -83,6 +86,7 @@ import {Recipes} from './recipes/recipes.component';
 })
 @RouteConfig([
   { path: '/', name: 'Index', component: Home, useAsDefault: true },
+  { path: '/notebook',  name: 'Notebook',  component: Notebooks },
   { path: '/home',  name: 'Home',  component: Home },
   { path: '/todo', component: Todo, name: 'Todo' },
   { path: '/redux', component: Recipes, name: 'Recipes' },
