@@ -4,6 +4,10 @@ let stateSchema = new mongoose.Schema({
 	name: { 
 		type: String,
 		required: true 
+	},
+	abbreviation: { 
+		type: String,
+		required: true 
 	}
 });
 

@@ -75,3 +75,4 @@ npm-debug.log
 .tmp
 .sass-cache
 *.swp
+.env

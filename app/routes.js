@@ -7,6 +7,8 @@
 
 // */app/routes.js*
 
+import moment from 'moment';
+
 // ## Node API Routes
 
 // Define routes for the Node backend
@@ -14,12 +16,14 @@
 // Load our API routes for user authentication
 import authRoutes from './routes/_authentication.router.js';
 
-// Load our API routes for the `todo` component
-import todoRoutes from './routes/_todo.router.js';
 import partRoutes from './routes/_part.router.js';
+import documentRoutes from './routes/_document.router.js';
+import sectionRoutes from './routes/_section.router.js';
+import inputRoutes from './routes/_input.router.js';
+import responseRoutes from './routes/_response.router.js';
+import stateRoutes from './routes/_state.router.js';
 
-// Load our API routes for the `recipe` component
-import recipeRoutes from './routes/_recipe.router.js';
+
 
 export default (app, router, passport) => {
 
@@ -35,9 +39,8 @@ export default (app, router, passport) => {
   // Define a middleware function to be used for all secured routes
   let auth = (req, res, next) => {
 
-    console.log("LETS SEEE")
     if (!req.isAuthenticated())
-      res.send(401);
+      res.status(401).json({message: "Not logged in"});
 
     else
       next();
@@ -48,10 +51,27 @@ export default (app, router, passport) => {
   let admin = (req, res, next) => {
 
     if (!req.isAuthenticated() || req.user.role !== 'admin')
-      res.send(401);
+      res.status(401).json({message: "Not Authorized"});
 
     else
       next();
+  };
+
+  let paid = (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({message: "Not Authorized"});
+    } else if(req.user.role == 'admin') {
+      next();
+    } else {
+      var currentMonth = moment().startOf('month');
+      var lastPaidMonth = moment(req.user.lastPaidAt);
+
+      if(currentMonth.month() == lastPaidMonth.month()) {
+        res.status(401).json({message: "Not Paid"});
+      } else {
+        next();
+      }
+    }
   };
 
   // ### Server Routes
@@ -66,11 +86,13 @@ export default (app, router, passport) => {
 
   // #### RESTful API Routes
 
-  // Pass in our Express app and Router
-  todoRoutes(app, router);
   partRoutes(app, router, auth, admin);
-
-	recipeRoutes(app, router);
+  documentRoutes(app, router, auth, admin);
+  sectionRoutes(app, router, auth, admin);
+  inputRoutes(app, router, auth, admin);
+  responseRoutes(app, router, auth, admin);
+  stateRoutes(app, router, auth, admin);
+	
 
 	// All of our routes will be prefixed with /api
 	app.use('/api', router);

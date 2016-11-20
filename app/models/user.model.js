@@ -16,6 +16,8 @@ import mongoose from 'mongoose';
 
 // Import library to hash passwords
 import bcrypt from 'bcrypt-nodejs';
+import Document from './document.model';
+import Assignment from './assignment.model';
 
 // Define the schema for the showcase item
 let userSchema = mongoose.Schema({
@@ -28,17 +30,18 @@ let userSchema = mongoose.Schema({
     email : { type : String, unique : true }
   },
 
-  state: [{type: mongoose.Schema.Types.ObjectId, ref:'State'}],
+  states: [{type: mongoose.Schema.Types.ObjectId, ref:'State'}],
   assignments: [{type: mongoose.Schema.Types.ObjectId, ref:'Assignment'}],
   responses: [{type: mongoose.Schema.Types.ObjectId, ref:'Response'}],
   notifications: [{type: mongoose.Schema.Types.ObjectId, ref:'Notification'}],
+  lastPaidAt : {type: Date},
 
   role : { type : String }
 });
 
 userSchema.pre('save', function (next) {
   var self = this;
-  console.log(this);
+  
   mongoose.model('User', userSchema).count({})
   .then(function (count) {
     if(count === 0) {
@@ -46,6 +49,36 @@ userSchema.pre('save', function (next) {
     }
 
     next();
+  });
+});
+
+userSchema.pre('save', function (next) {
+  this.lastPaidAt = this.lastPaidAt || Date.now();
+  next();
+});
+
+userSchema.post('save', function (user) { // ASSIGN DOCUMENTS TO THE NEW USER
+  Document.find()
+  .then(function(documents) {
+    documents.forEach(function(document) {
+      if(!document.state || document.state == user.state) {
+        Assignment.count({
+          user: user._id,
+          document: document._id
+        })
+        .then(function(count) {
+          if(count === 0) {
+            Assignment.create({
+              user: user._id,
+              document: document._id
+            })
+            .then(( (assignments) => {} )) 
+            .error(( (err) => console.log(err) ))
+            ;
+          }
+        });
+      }
+    });
   });
 });
 

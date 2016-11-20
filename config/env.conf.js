@@ -15,6 +15,9 @@
 // # Node Env Variables
 
 import config from './config.json';
+import env from 'node-env-file';
+
+try{ env(__dirname + '/../.env'); } catch(err) {}
 
 // Check each necessary node `environment variable` to see if a
 // value has been set and if not, use the `config` object to
