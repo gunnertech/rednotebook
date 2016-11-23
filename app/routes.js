@@ -22,6 +22,10 @@ import sectionRoutes from './routes/_section.router.js';
 import inputRoutes from './routes/_input.router.js';
 import responseRoutes from './routes/_response.router.js';
 import stateRoutes from './routes/_state.router.js';
+import subscriptionRoutes from './routes/_subscription.router.js';
+
+import todoRoutes from './routes/_todo.router.js';
+import recipeRoutes from './routes/_recipe.router.js';
 
 
 
@@ -62,15 +66,10 @@ export default (app, router, passport) => {
       res.status(401).json({message: "Not Authorized"});
     } else if(req.user.role == 'admin') {
       next();
+    } else if(!req.user.hasValidSubscription) {
+      res.status(401).json({message: "Not Paid"});
     } else {
-      var currentMonth = moment().startOf('month');
-      var lastPaidMonth = moment(req.user.lastPaidAt);
-
-      if(currentMonth.month() == lastPaidMonth.month()) {
-        res.status(401).json({message: "Not Paid"});
-      } else {
-        next();
-      }
+      next();
     }
   };
 
@@ -84,6 +83,9 @@ export default (app, router, passport) => {
   // Also pass in auth & admin middleware and Passport instance
   authRoutes(app, router, passport, auth, admin);
 
+  todoRoutes(app, router);
+  recipeRoutes(app, router);
+
   // #### RESTful API Routes
 
   partRoutes(app, router, auth, admin);
@@ -92,6 +94,7 @@ export default (app, router, passport) => {
   inputRoutes(app, router, auth, admin);
   responseRoutes(app, router, auth, admin);
   stateRoutes(app, router, auth, admin);
+  subscriptionRoutes(app, router, auth, admin);
 	
 
 	// All of our routes will be prefixed with /api

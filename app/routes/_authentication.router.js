@@ -22,6 +22,14 @@
 
 // Load user model
 import User from '../models/user.model.js';
+import Recurly from 'node-recurly';
+
+let recurly = new Recurly({
+  API_KEY:      process.env.RECURLY_API_KEY,
+  SUBDOMAIN:    process.env.RECURLY_ACCOUNT_NAME,
+  ENVIRONMENT:  process.env.RECURLY_ACCOUNT_ENV,
+  DEBUG: false
+}); 
 
 // Load the Mongoose ObjectId function to cast string as
 // ObjectId
@@ -71,11 +79,23 @@ export default (app, router, passport, auth, admin) => {
         if (err)
           return next(err);
 
-        // Set HTTP status code `200 OK`
-        res.status(200);
+        var recurlyAccountCode = user.recurlyAccountCode || 'recurly_1_11';
 
-        // Return the user object
-        res.send(req.user);
+        recurly.subscriptions.listByAccount(recurlyAccountCode, {}, function(response) {
+          if(typeof(response.data.subscriptions.subscription.length) == 'undefined') {
+            user.recurlyAccountStatus = response.data.subscriptions.subscription.state;
+            user.save()
+            .then(function() {
+              // Set HTTP status code `200 OK`
+              res.status(200);
+
+              // Return the user object
+              res.send(req.user);
+            });
+          } else {
+            console.log(response.data.subscriptions.subscription.length);
+          }
+        });        
       });
 
     }) (req, res, next);

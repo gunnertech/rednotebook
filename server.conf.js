@@ -102,22 +102,45 @@ import User from './app/models/user.model';
 import Document from './app/models/document.model';
 import State from './app/models/state.model';
 
-import Recurly from 'node-recurly';
+// import Recurly from 'node-recurly';
 
-var recurly = new Recurly({
-  API_KEY:      process.env.RECURLY_API_KEY,
-  SUBDOMAIN:    process.env.RECURLY_ACCOUNT_NAME,
-  ENVIRONMENT:  process.env.RECURLY_ACCOUNT_ENV,
-  DEBUG: false
-});
+// let recurly = new Recurly({
+//   API_KEY:      process.env.RECURLY_API_KEY,
+//   SUBDOMAIN:    process.env.RECURLY_ACCOUNT_NAME,
+//   ENVIRONMENT:  process.env.RECURLY_ACCOUNT_ENV,
+//   DEBUG: false
+// });
 
-recurly.accounts.list({}, function(response) {
-  response.data.accounts.account.forEach(function(account) {
-    recurly.transactions.listByAccount(account.account_code, {type: "purchase", status: "success"}, function(response) {
-      console.log(response.data.transactions.transaction)
-    });
-  });
-});
+// var getAccount = Promise.promisify(recurly.accounts.get);
+// var createAccount = Promise.promisify(recurly.accounts.create);
+
+
+// User.findById("582f5d91f28dfe2d3c80d0d4")
+// .then(function(user) {
+//   user.billingInfo = {
+//     firstName: 'Jesse',
+//     lastName: 'James',
+//     country: 'US',
+//     city: 'Port Saint Lucie',
+//     state: 'FL',
+//     zip: '34983',
+//     address1: '153 NE Sagamore Ter',
+//     address2: '',
+//     creditCardNumber: '4111-1111-1111-1111',
+//     creditCardExpirationMonth: '1',
+//     creditCardExpirationYear: '2024'
+//   };
+
+//   return user.subscribe();
+// })
+// .then(function(response) {
+//   console.log('hree')
+//   console.log(response.data);
+// })
+// .catch(function(err) {
+//   console.log('err')
+//   console.log(err.data);
+// });
 
 
 User.findOne({'local.email': 'dougwett@gmail.com'})
@@ -127,7 +150,7 @@ User.findOne({'local.email': 'dougwett@gmail.com'})
     newUser.role = 'admin';
     newUser.local.username = "dougj".toLowerCase();
     newUser.local.email = "dougwett@gmail.com".toLowerCase();
-    newUser.local.password = newUser.generateHash(process.env.adminPassword || "Changemenowplease1!!");
+    newUser.local.password = newUser.generateHash(process.env.ADMIN_PASSWORD || "Changemenowplease1!!");
 
     return newUser.save();
   } else {

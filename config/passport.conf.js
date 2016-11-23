@@ -75,7 +75,7 @@ export default (passport) => {
     let sessionUser = {
 
       _id : user._id,
-
+      hasValidSubscription: user.hasValidSubscription,
       username : user.local.username,
 
       role : user.role

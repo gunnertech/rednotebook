@@ -19,22 +19,43 @@ import bcrypt from 'bcrypt-nodejs';
 import Document from './document.model';
 import Assignment from './assignment.model';
 
+import Recurly from 'node-recurly';
+import Promise from 'bluebird';
+
+let recurly = new Recurly({
+  API_KEY:      process.env.RECURLY_API_KEY,
+  SUBDOMAIN:    process.env.RECURLY_ACCOUNT_NAME,
+  ENVIRONMENT:  process.env.RECURLY_ACCOUNT_ENV,
+  DEBUG: false
+});
+
 // Define the schema for the showcase item
 let userSchema = mongoose.Schema({
 
   local : {
     username : { type : String, unique : true },
-
     password : String,
-
     email : { type : String, unique : true }
+  },
+
+  billingInfo: {
+    firstName: String,
+    lastName: String,
+    address1: String,
+    address2: String,
+    city: String,
+    state: String,
+    zip: String  
   },
 
   states: [{type: mongoose.Schema.Types.ObjectId, ref:'State'}],
   assignments: [{type: mongoose.Schema.Types.ObjectId, ref:'Assignment'}],
   responses: [{type: mongoose.Schema.Types.ObjectId, ref:'Response'}],
   notifications: [{type: mongoose.Schema.Types.ObjectId, ref:'Notification'}],
-  lastPaidAt : {type: Date},
+  
+  recurlySubscriptionId : { type : String, unique : true },
+  recurlyAccountCode : { type : String, unique : true },
+  recurlyAccountStatus : { type : String, default: 'in_trial', enum : ['active', 'canceled', 'expired', 'future', 'in_trial', 'live', 'past_due'] },
 
   role : { type : String }
 });
@@ -53,7 +74,7 @@ userSchema.pre('save', function (next) {
 });
 
 userSchema.pre('save', function (next) {
-  this.lastPaidAt = this.lastPaidAt || Date.now();
+  this.recurlyAccountCode = `recurly_rednotebook_${this._id}`;
   next();
 });
 
@@ -82,12 +103,102 @@ userSchema.post('save', function (user) { // ASSIGN DOCUMENTS TO THE NEW USER
   });
 });
 
+userSchema.set('toObject', {
+  getters: true,
+  virtuals: true
+});
+
+userSchema.set('toJSON', {
+  getters: true,
+  virtuals: true
+});
+
+userSchema.virtual('billingInfo.creditCardNumber').set(function(creditCardNumber) {
+  return this.billingInfo.number = creditCardNumber;
+});
+
+userSchema.virtual('billingInfo.creditCardNumber').get(function() {
+  return this.billingInfo.number;
+});
+
+userSchema.virtual('billingInfo.creditCardExpirationMonth').set(function(creditCardExpirationMonth) {
+  return this.billingInfo.month = creditCardExpirationMonth;
+});
+
+userSchema.virtual('billingInfo.creditCardExpirationMonth').get(function() {
+  return this.billingInfo.month;
+});
+
+userSchema.virtual('billingInfo.creditCardExpirationYear').set(function(creditCardExpirationYear) {
+  return this.billingInfo.year = creditCardExpirationYear;
+});
+
+userSchema.virtual('billingInfo.creditCardExpirationYear').get(function() {
+  return this.billingInfo.year;
+});
+
+userSchema.virtual('hasValidSubscription').get(function() {
+  return this.recurlyAccountStatus == "active" || this.recurlyAccountStatus == "live" || this.recurlyAccountStatus == "in_trial";
+});
+
 // ## Methods
 
 // ### Generate a hash
 userSchema.methods.generateHash = function(password) {
 
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+};
+
+userSchema.methods.subscribe = function() {
+  var createSubscription = Promise.promisify(recurly.subscriptions.create);
+  var createAccount = Promise.promisify(recurly.accounts.create);
+  var getAccount = Promise.promisify(recurly.accounts.get);
+  var self = this;
+
+  return getAccount(self.recurlyAccountCode)
+  .then(function(response) {
+    return response;
+  })
+  .catch(function(err) {
+    return createAccount({
+      account_code: (self.recurlyAccountCode),
+      first_name: self.billingInfo.firstName,
+      last_name: self.billingInfo.lastName,
+      email: self.local.email,
+      billing_info: {
+        first_name: self.billingInfo.firstName,
+        last_name: self.billingInfo.lastName,
+        country: 'US',
+        city: self.billingInfo.city,
+        state: self.billingInfo.state,
+        zip: self.billingInfo.zip,
+        address1: self.billingInfo.address1,
+        address2: self.billingInfo.address2,
+        number: self.billingInfo.creditCardNumber,
+        month: self.billingInfo.creditCardExpirationMonth,
+        year: self.billingInfo.creditCardExpirationYear
+      },
+      address: {
+        country: 'US',
+        city: self.billingInfo.city,
+        state: self.billingInfo.state,
+        zip: self.billingInfo.zip,
+        address1: self.billingInfo.address1,
+        address2: self.billingInfo.address2
+      }
+    });
+  })
+  .then(function(response) {
+    var obj = {
+      plan_code: process.env.RECURLY_SUBSCRIPTION_CODE,
+      currency: 'USD',
+      customer_notes: 'Thank you!',
+      account: {
+        account_code: self.recurlyAccountCode
+      }
+    };
+    return createSubscription(obj).catch(function(err){ console.log(err.data); });
+  });
 };
 
 // ### Check if password is valid
