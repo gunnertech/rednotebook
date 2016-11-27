@@ -20,7 +20,7 @@ import Input from '../models/input.model';
 
 import _ from 'lodash';
 
-export default (app, router, auth, admin) => {
+export default (app, router, auth, admin, paid) => {
 
   router.route('/input')
     .post(admin, (req, res) => {

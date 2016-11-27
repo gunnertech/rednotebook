@@ -35,7 +35,7 @@ let recurly = new Recurly({
 // ObjectId
 let ObjectId = require('mongoose').Types.ObjectId;
 
-export default (app, router, passport, auth, admin) => {
+export default (app, router, passport, auth, admin, paid) => {
 
   // ### Authentication API Routes
 
@@ -143,7 +143,7 @@ export default (app, router, passport, auth, admin) => {
 
   // Route to get the current user
   // The `auth` middleware was passed in to this function from `routes.js`
-  router.get('/auth/user', auth, (req, res) => {
+  router.get('/auth/user', paid, (req, res) => {
 
     // Send response in JSON to allow disassembly of object by functions
     res.json(req.user);

@@ -18,7 +18,7 @@
 
 import Part from '../models/part.model';
 
-export default (app, router, auth, admin) => {
+export default (app, router, auth, admin, paid) => {
 
   router.route('/part')
     .post(admin, (req, res) => {

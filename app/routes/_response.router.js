@@ -20,7 +20,7 @@ import Response from '../models/response.model';
 
 import _ from 'lodash';
 
-export default (app, router, auth, admin) => {
+export default (app, router, auth, admin, paid) => {
 
   router.route('/response')
     .post(auth, (req, res) => {

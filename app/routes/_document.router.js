@@ -20,7 +20,7 @@ import Document from '../models/document.model';
 
 import _ from 'lodash';
 
-export default (app, router, auth, admin) => {
+export default (app, router, auth, admin, paid) => {
 
   router.route('/document')
     .post(admin, (req, res) => {

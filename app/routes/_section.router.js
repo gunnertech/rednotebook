@@ -20,7 +20,7 @@ import Section from '../models/section.model';
 
 import _ from 'lodash';
 
-export default (app, router, auth, admin) => {
+export default (app, router, auth, admin, paid) => {
 
   router.route('/section')
     .post(admin, (req, res) => {

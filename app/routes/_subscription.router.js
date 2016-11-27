@@ -15,7 +15,7 @@
 
 import User from '../models/user.model';
 
-export default (app, router, auth, admin) => {
+export default (app, router, auth, admin, paid) => {
   router.route('/subscription')
     .post(auth, (req, res) => {
 

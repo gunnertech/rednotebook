@@ -62,10 +62,16 @@ export default (app, router, passport) => {
   };
 
   let paid = (req, res, next) => {
+    var today = moment().startOf('day');
+    var accountStartDate = moment(req.user && req.user.createdAt ? req.user.createdAt : Date.now() ).startOf('day');
+    var daysBetween = moment.duration(today.diff(accountStartDate)).days();
+
     if (!req.isAuthenticated()) {
       res.status(401).json({message: "Not Authorized"});
     } else if(req.user.role == 'admin') {
       next();
+    } else if(req.user.recurlyAccountStatus == 'in_trial' && daysBetween > 30) {
+      res.status(401).json({message: "Free Trial Ended"});
     } else if(!req.user.hasValidSubscription) {
       res.status(401).json({message: "Not Paid"});
     } else {
@@ -81,20 +87,20 @@ export default (app, router, passport) => {
 
   // Pass in our Express app and Router.
   // Also pass in auth & admin middleware and Passport instance
-  authRoutes(app, router, passport, auth, admin);
+  authRoutes(app, router, passport, auth, admin, paid);
 
   todoRoutes(app, router);
   recipeRoutes(app, router);
 
   // #### RESTful API Routes
 
-  partRoutes(app, router, auth, admin);
-  documentRoutes(app, router, auth, admin);
-  sectionRoutes(app, router, auth, admin);
-  inputRoutes(app, router, auth, admin);
-  responseRoutes(app, router, auth, admin);
-  stateRoutes(app, router, auth, admin);
-  subscriptionRoutes(app, router, auth, admin);
+  partRoutes(app, router, auth, admin, paid);
+  documentRoutes(app, router, auth, admin, paid);
+  sectionRoutes(app, router, auth, admin, paid);
+  inputRoutes(app, router, auth, admin, paid);
+  responseRoutes(app, router, auth, admin, paid);
+  stateRoutes(app, router, auth, admin, paid);
+  subscriptionRoutes(app, router, auth, admin, paid);
 	
 
 	// All of our routes will be prefixed with /api

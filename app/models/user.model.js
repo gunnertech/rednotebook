@@ -58,6 +58,8 @@ let userSchema = mongoose.Schema({
   recurlyAccountStatus : { type : String, default: 'in_trial', enum : ['active', 'canceled', 'expired', 'future', 'in_trial', 'live', 'past_due'] },
 
   role : { type : String }
+}, {
+  timestamps: true
 });
 
 userSchema.pre('save', function (next) {
