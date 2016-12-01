@@ -23,7 +23,7 @@ import _ from 'lodash';
 export default (app, router, auth, admin, paid) => {
 
   router.route('/response')
-    .post(auth, (req, res) => {
+    .post(auth, paid, (req, res) => {
       var safeProperties = req.body;
       Response.create(safeProperties)
       .then( (response) => {
@@ -34,7 +34,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
 
-    .get(auth, (req, res) => {
+    .get(auth, paid, (req, res) => {
       Response.find().sort({position: 1})
       .then( (responses) => {
         res.json(responses);
@@ -45,7 +45,7 @@ export default (app, router, auth, admin, paid) => {
     });
 
   router.route('/response/:response_id')
-    .get(auth, (req, res) => {
+    .get(auth, paid, (req, res) => {
       Response.findOne({'_id': req.params.response_id}).populate(['master','children'])
       .then( (response) => {
         res.json(response);
@@ -55,7 +55,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
     
-    .put(auth, (req, res) => {
+    .put(auth, paid, (req, res) => {
       Response.findOne({'_id': req.params.response_id})
       .then( (response) => {
         var safeProperties = req.body;
@@ -70,7 +70,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
 
-    .delete(auth, (req, res) => {
+    .delete(auth, paid, (req, res) => {
 
       Response.remove({
         _id : req.params.response_id

@@ -28,7 +28,7 @@ validateEnvVariables();
 // Load Express
 import express from 'express';
 // Load Socket.io
-// import socketio from 'socket.io';
+import socketio from 'socket.io';
 // Load Node http module
 import http from 'http';
 // Create our app with Express
@@ -36,7 +36,7 @@ let app = express();
 // Create a Node server for our Express app
 let server = http.createServer(app);
 // Integrate Socket.io
-// let io = socketio.listen(server);
+let io = socketio.listen(server);
 // Load Mongoose for MongoDB interactions
 import mongoose from 'mongoose';
 import Promise from 'bluebird';
@@ -55,7 +55,7 @@ import session from 'express-session';
 // # Configuration
 
 // Load Socket.io server functionality
-// import base from './sockets/base';
+import base from './sockets/base';
 
 // base(io);
 

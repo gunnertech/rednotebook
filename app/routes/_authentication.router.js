@@ -23,6 +23,22 @@
 // Load user model
 import User from '../models/user.model.js';
 import Recurly from 'node-recurly';
+import authConfig from '../../config/auth';
+import jwt from 'jsonwebtoken'; 
+
+function generateToken(user){
+  return jwt.sign(user, authConfig.secret, {
+    expiresIn: 10080
+  });
+}
+
+function setUserInfo(user) {
+  return {
+    _id: user._id,
+    email: user.local.email,
+    role: user.role
+  };
+}
 
 let recurly = new Recurly({
   API_KEY:      process.env.RECURLY_API_KEY,
@@ -40,11 +56,11 @@ export default (app, router, passport, auth, admin, paid) => {
   // ### Authentication API Routes
 
   // Route to test if the user is logged in or not
-  router.get('/auth/loggedIn', (req, res) => {
+  router.get('/auth/loggedIn', auth, (req, res) => {
 
     // If the user is authenticated, return a user object
     // else return 0
-    res.send(req.isAuthenticated() ? req.user : '0');
+    res.send({ content: 'success' });
   });
 
   // Route to log a user in
@@ -90,7 +106,11 @@ export default (app, router, passport, auth, admin, paid) => {
               res.status(200);
 
               // Return the user object
-              res.send(req.user);
+              var userInfo = setUserInfo(user);
+              res.status(200).json({
+                token: 'JWT ' + generateToken(userInfo),
+                user: user
+              });
             });
           } else {
             console.log(response.data.subscriptions.subscription.length);
@@ -124,8 +144,11 @@ export default (app, router, passport, auth, admin, paid) => {
         return next(info.signupMessage);
       }
 
-      // Set HTTP status code `204 No Content`
-      res.sendStatus(204);
+      var userInfo = setUserInfo(user);
+      res.send(201).json({
+        token: 'JWT ' + generateToken(userInfo),
+        user: user
+      })
 
     }) (req, res, next);
   });

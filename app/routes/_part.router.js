@@ -21,7 +21,7 @@ import Part from '../models/part.model';
 export default (app, router, auth, admin, paid) => {
 
   router.route('/part')
-    .post(admin, (req, res) => {
+    .post(auth, admin, (req, res) => {
       Part.create({
         title: req.body.title,
         position: req.body.position
@@ -34,7 +34,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
 
-    .get(auth, (req, res) => {
+    .get(auth, paid, (req, res) => {
       Part.find().sort({position: 1})
       .then( (parts) => {
         res.json(parts);
@@ -45,7 +45,7 @@ export default (app, router, auth, admin, paid) => {
     });
 
   router.route('/part/:part_id')
-    .get(auth, (req, res) => {
+    .get(auth, paid, (req, res) => {
       Part.findOne({'_id': req.params.part_id}).populate('documents')
       .then( (part) => {
         res.json(part);
@@ -55,7 +55,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
     
-    .put(admin, (req, res) => {
+    .put(auth, admin, (req, res) => {
       Part.findOne({'_id': req.params.part_id})
       .then( (part) => {
         part.title = req.body.title || part.title;
@@ -71,7 +71,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
 
-    .delete(admin, (req, res) => {
+    .delete(auth, admin, (req, res) => {
 
       Part.remove({
         _id : req.params.part_id

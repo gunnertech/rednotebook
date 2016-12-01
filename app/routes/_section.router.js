@@ -23,7 +23,7 @@ import _ from 'lodash';
 export default (app, router, auth, admin, paid) => {
 
   router.route('/section')
-    .post(admin, (req, res) => {
+    .post(auth, admin, (req, res) => {
       var safeProperties = req.body;
       Section.create(safeProperties)
       .then( (section) => {
@@ -34,7 +34,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
 
-    .get(auth, (req, res) => {
+    .get(auth, paid, (req, res) => {
       Section.find().sort({position: 1})
       .then( (sections) => {
         res.json(sections);
@@ -45,7 +45,7 @@ export default (app, router, auth, admin, paid) => {
     });
 
   router.route('/section/:section_id')
-    .get(auth, (req, res) => {
+    .get(auth, paid, (req, res) => {
       Section.findOne({'_id': req.params.section_id}).populate(['master','children','inputs'])
       .then( (section) => {
         res.json(section);
@@ -55,7 +55,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
     
-    .put(admin, (req, res) => {
+    .put(auth, admin, (req, res) => {
       Section.findOne({'_id': req.params.section_id})
       .then( (section) => {
         var safeProperties = req.body;
@@ -70,7 +70,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
 
-    .delete(admin, (req, res) => {
+    .delete(auth, admin, (req, res) => {
 
       Section.remove({
         _id : req.params.section_id

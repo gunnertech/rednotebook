@@ -23,7 +23,7 @@ import _ from 'lodash';
 export default (app, router, auth, admin, paid) => {
 
   router.route('/document')
-    .post(admin, (req, res) => {
+    .post(auth, admin, (req, res) => {
       var safeProperties = req.body;
       Document.create(safeProperties)
       .then( (document) => {
@@ -34,7 +34,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
 
-    .get(auth, (req, res) => {
+    .get(auth, paid, (req, res) => {
       Document.find().sort({position: 1})
       .then( (documents) => {
         res.json(documents);
@@ -45,7 +45,7 @@ export default (app, router, auth, admin, paid) => {
     });
 
   router.route('/document/:document_id')
-    .get(auth, (req, res) => {
+    .get(auth, paid, (req, res) => {
       Document.findOne({'_id': req.params.document_id}).populate(['part','sections','state','assignments'])
       .then( (document) => {
         res.json(document);
@@ -55,7 +55,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
     
-    .put(admin, (req, res) => {
+    .put(auth, admin, (req, res) => {
       Document.findOne({'_id': req.params.document_id})
       .then( (document) => {
         var safeProperties = req.body;
@@ -70,7 +70,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
 
-    .delete(admin, (req, res) => {
+    .delete(auth, admin, (req, res) => {
 
       Document.remove({
         _id : req.params.document_id

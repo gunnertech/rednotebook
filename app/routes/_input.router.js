@@ -23,7 +23,7 @@ import _ from 'lodash';
 export default (app, router, auth, admin, paid) => {
 
   router.route('/input')
-    .post(admin, (req, res) => {
+    .post(auth, admin, (req, res) => {
       var safeProperties = req.body;
       Input.create(safeProperties)
       .then( (input) => {
@@ -34,7 +34,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
 
-    .get(auth, (req, res) => {
+    .get(auth, paid,  (req, res) => {
       Input.find().sort({position: 1})
       .then( (inputs) => {
         res.json(inputs);
@@ -45,7 +45,7 @@ export default (app, router, auth, admin, paid) => {
     });
 
   router.route('/input/:input_id')
-    .get(auth, (req, res) => {
+    .get(auth, paid, (req, res) => {
       Input.findOne({'_id': req.params.input_id}).populate(['master','children','responses'])
       .then( (input) => {
         res.json(input);
@@ -55,7 +55,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
     
-    .put(admin, (req, res) => {
+    .put(auth, admin, (req, res) => {
       Input.findOne({'_id': req.params.input_id})
       .then( (input) => {
         var safeProperties = req.body;
@@ -70,7 +70,7 @@ export default (app, router, auth, admin, paid) => {
       });
     })
 
-    .delete(admin, (req, res) => {
+    .delete(auth, admin, (req, res) => {
 
       Input.remove({
         _id : req.params.input_id

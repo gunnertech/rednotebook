@@ -26,6 +26,11 @@ import subscriptionRoutes from './routes/_subscription.router.js';
 
 import todoRoutes from './routes/_todo.router.js';
 import recipeRoutes from './routes/_recipe.router.js';
+import User from './models/user.model.js';
+
+import passport from 'passport';
+
+var jwtAuth = passport.authenticate('jwt-login', {session: false});
 
 
 
@@ -42,41 +47,58 @@ export default (app, router, passport) => {
 
   // Define a middleware function to be used for all secured routes
   let auth = (req, res, next) => {
-
-    if (!req.isAuthenticated())
-      res.status(401).json({message: "Not logged in"});
-
-    else
+    if (req.isAuthenticated()) {
+      console.log("Authenticated via session");
       next();
+    } else {
+      passport.authenticate('jwt-login', {session: false}, (err, user, info) => {
+        if (err) { 
+          next(err);
+        } else if(user) {
+          console.log("Authenticated via jwt");
+          req.user = user;
+          next();
+        } else {
+          res.status(401).json({message: "Not logged in"});
+          // next('Unauthorized');
+        } 
+      })(req, res, next);
+    }
   };
 
-  // Define a middleware function to be used for all secured administration
-  // routes
   let admin = (req, res, next) => {
+    User.findById(req.user._id, function(err, foundUser) {
+      if(err) {
+        res.status(422).json({error: 'No user found.'});
+        next(err);
+      } else if('admin' === foundUser.role) {
+        next();
+      } else {
+        res.status(401).json({error: 'You are not authorized to view this content'});
+      }
+    });
+  }
 
-    if (!req.isAuthenticated() || req.user.role !== 'admin')
-      res.status(401).json({message: "Not Authorized"});
-
-    else
-      next();
-  };
 
   let paid = (req, res, next) => {
     var today = moment().startOf('day');
-    var accountStartDate = moment(req.user && req.user.createdAt ? req.user.createdAt : Date.now() ).startOf('day');
-    var daysBetween = moment.duration(today.diff(accountStartDate)).days();
 
-    if (!req.isAuthenticated()) {
-      res.status(401).json({message: "Not Authorized"});
-    } else if(req.user.role == 'admin') {
-      next();
-    } else if(req.user.recurlyAccountStatus == 'in_trial' && daysBetween > 30) {
-      res.status(401).json({message: "Free Trial Ended"});
-    } else if(!req.user.hasValidSubscription) {
-      res.status(401).json({message: "Not Paid"});
-    } else {
-      next();
-    }
+    User.findById(req.user._id, function(err, user) { 
+      var accountStartDate = moment(user && user.createdAt ? user.createdAt : Date.now() ).startOf('day');
+      var daysBetween = moment.duration(today.diff(accountStartDate)).days();
+
+      if(user.role === 'admin') {
+        next();
+      } else if(user.recurlyAccountStatus == 'in_trial' && daysBetween > 30) {
+        res.status(401).json({message: "Free Trial Ended"});
+        next('Unauthorized');
+      } else if(!user.hasValidSubscription) {
+        status(401).json({message: "Not Paid"});
+        next('Unauthorized');
+      } else {
+        next();
+      }
+    });
   };
 
   // ### Server Routes

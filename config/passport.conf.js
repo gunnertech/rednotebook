@@ -12,11 +12,19 @@
 
 // Load PassportJS strategies
 import LocalStrategy from 'passport-local';
+import { Strategy as JwtStrategy } from 'passport-jwt';
+import { ExtractJwt as ExtractJwt } from 'passport-jwt';
+import auth from './auth';
 
 // Load user model
 import User from '../app/models/user.model.js';
 
 export default (passport) => {
+
+  let jwtOptions = {
+    jwtFromRequest: ExtractJwt.fromAuthHeader(),
+    secretOrKey: auth.secret
+  };
 
   // Define length boundariess for expected parameters
   let bounds = {
@@ -94,6 +102,21 @@ export default (passport) => {
     // session collection
     done(null, sessionUser);
   });
+
+  passport.use('jwt-login', new JwtStrategy(jwtOptions, function(payload, done) {
+    console.log("TRYING JWT")
+    User.findById(payload._id, function(err, user) {
+      if(err) { 
+        return done(err, false);
+      } 
+
+      if(user) {
+        done(null, user);
+      } else {
+        done(null, false);
+      }
+    });
+  }))
 
   // # Local Signup
 

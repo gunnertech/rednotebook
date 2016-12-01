@@ -10,17 +10,17 @@
   "author": "Cody Swann <cody@gunnertech.com>",
   "homepage": "https://github.com/gunnertech/rednotebook",
   "license": "MIT",
-  "scripts": {
-    
-  },
+  "scripts": {},
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.1",
     "cookie-parser": "^1.4.3",
     "core-js": "^2.4.1",
+    "cors": "^2.8.1",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
+    "jsonwebtoken": "^7.1.9",
     "lodash": "^4.17.2",
     "method-override": "^2.3.6",
     "moment": "^2.16.0",
@@ -29,7 +29,9 @@
     "node-recurly": "git+https://github.com/cgerrior/node-recurly.git",
     "nodemailer": "^2.6.4",
     "passport": "^0.3.2",
-    "passport-local": "^1.0.0"
+    "passport-jwt": "^2.2.1",
+    "passport-local": "^1.0.0",
+    "socket.io": "^1.7.1"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
