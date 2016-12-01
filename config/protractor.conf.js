@@ -1,13 +1,17 @@
-// @datatype_void
+/**
+ * @author: @AngularClass
+ */
+
 require('ts-node/register');
+var helpers = require('./helpers');
 
 exports.config = {
   baseUrl: 'http://localhost:3000/',
 
   // use `npm run e2e`
   specs: [
-    'src/**/**.e2e.ts',
-    'src/**/*.e2e.ts'
+    helpers.root('src/**/**.e2e.ts'),
+    helpers.root('src/**/*.e2e.ts')
   ],
   exclude: [],
 
@@ -40,7 +44,6 @@ exports.config = {
    *
    * useAllAngular2AppRoots: tells Protractor to wait for any angular2 apps on the page instead of just the one matching
    * `rootEl`
-   *
    */
    useAllAngular2AppRoots: true
 };

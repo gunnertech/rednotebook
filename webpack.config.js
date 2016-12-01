@@ -1,21 +1,19 @@
-// ```
-// @datatype_void
-// david.r.niciforovic@gmail.com
-// webpack.config.js may be freely distributed under the MIT license
-// ```
+/**
+ * @author: @AngularClass
+ */
 
-// Look in `./config` folder for `webpack.*.config.js`
+// Look in ./config folder for webpack.dev.js
 switch (process.env.NODE_ENV) {
   case 'prod':
   case 'production':
-    module.exports = require('./config/webpack.prod');
+    module.exports = require('./config/webpack.prod')({env: 'production'});
     break;
   case 'test':
   case 'testing':
-    module.exports = require('./config/webpack.test');
+    module.exports = require('./config/webpack.test')({env: 'test'});
     break;
   case 'dev':
   case 'development':
   default:
-    module.exports = require('./config/webpack.dev');
+    module.exports = require('./config/webpack.dev')({env: 'development'});
 }

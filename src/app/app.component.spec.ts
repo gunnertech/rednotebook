@@ -1,24 +1,33 @@
-import {
-  it,
-  inject,
-  injectAsync,
-  beforeEachProviders,
-  TestComponentBuilder
-} from '@angular/core/testing';
+/* tslint:disable:no-unused-variable */
 
-// Load the implementations that should be tested
-import {App} from './app.component';
-import {AppState} from './app.service';
+import { TestBed, async } from '@angular/core/testing';
+import { AppComponent } from './app.component';
 
-describe('App', () => {
-  // provide our implementations or mocks to the dependency injector
-  beforeEachProviders(() => [
-    AppState,
-    App
-  ]);
+describe('AppComponent', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        AppComponent
+      ],
+    });
+  });
 
-  it('should have a url', inject([ App ], (app) => {
-    expect(app.url).toEqual('https://twitter.com/datatype_void');
+  it('should create the app', async(() => {
+    let fixture = TestBed.createComponent(AppComponent);
+    let app = fixture.debugElement.componentInstance;
+    expect(app).toBeTruthy();
   }));
 
+  it(`should have as title 'app works!'`, async(() => {
+    let fixture = TestBed.createComponent(AppComponent);
+    let app = fixture.debugElement.componentInstance;
+    expect(app.title).toEqual('app works!');
+  }));
+
+  it('should render title in a h1 tag', async(() => {
+    let fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    let compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('h1').textContent).toContain('app works!');
+  }));
 });
