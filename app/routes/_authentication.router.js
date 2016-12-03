@@ -35,7 +35,7 @@ function generateToken(user){
 function setUserInfo(user) {
   return {
     _id: user._id,
-    email: user.local.email,
+    email: user.email || (user.local ? user.local.email : ""),
     role: user.role
   };
 }
@@ -82,10 +82,10 @@ export default (app, router, passport, auth, admin, paid) => {
       if (!user) {
 
         // Set HTTP status code `401 Unauthorized`
-        res.status(401);
+        res.status(401).send({});
 
         // Return the info message
-        return next(info.loginMessage);
+        // return next(info.loginMessage);
       }
 
       // Use login function exposed by Passport to establish a login
@@ -136,19 +136,19 @@ export default (app, router, passport, auth, admin, paid) => {
 
       // If no user is returned...
       if (!user) {
-
+        console.log(info)
         // Set HTTP status code `401 Unauthorized`
-        res.status(401);
+        res.status(401).json(info);
 
-        // Return the info message
-        return next(info.signupMessage);
+        // // Return the info message
+        // return next(info.signupMessage);
+      } else {
+        var userInfo = setUserInfo(user);
+        res.status(201).json({
+          token: 'JWT ' + generateToken(userInfo),
+          user: user
+        });
       }
-
-      var userInfo = setUserInfo(user);
-      res.send(201).json({
-        token: 'JWT ' + generateToken(userInfo),
-        user: user
-      })
 
     }) (req, res, next);
   });
