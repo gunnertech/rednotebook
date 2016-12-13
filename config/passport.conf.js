@@ -79,17 +79,22 @@ export default (passport) => {
 
   // ## Serialize User
   passport.serializeUser((user, done) => {
+    console.log(user);
 
-    let sessionUser = {
+    if(!user) {
+      done(null, null);
+    } else {
+      let sessionUser = {
 
-      _id : user._id,
-      hasValidSubscription: user.hasValidSubscription,
-      username : user.local.username,
+        _id : user._id,
+        hasValidSubscription: user.hasValidSubscription,
+        username : user.local.username,
 
-      role : user.role
-    };
+        role : user.role
+      };
 
-    done(null, sessionUser);
+      done(null, sessionUser);
+    }
   });
 
   // ## Deserialize User

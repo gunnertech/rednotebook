@@ -23,9 +23,11 @@ import inputRoutes from './routes/_input.router.js';
 import responseRoutes from './routes/_response.router.js';
 import stateRoutes from './routes/_state.router.js';
 import subscriptionRoutes from './routes/_subscription.router.js';
+import notebookRoutes from './routes/_notebook.router.js';
 
-import todoRoutes from './routes/_todo.router.js';
-import recipeRoutes from './routes/_recipe.router.js';
+// import todoRoutes from './routes/_todo.router.js';
+// import recipeRoutes from './routes/_recipe.router.js';
+
 import User from './models/user.model.js';
 
 import passport from 'passport';
@@ -51,14 +53,18 @@ export default (app, router, passport) => {
       console.log("Authenticated via session");
       next();
     } else {
+      console.log("Let's try JWT");
       passport.authenticate('jwt-login', {session: false}, (err, user, info) => {
         if (err) { 
+          console.log(err);
           next(err);
         } else if(user) {
           console.log("Authenticated via jwt");
+          console.log(user);
           req.user = user;
           next();
         } else {
+          console.log(info);
           res.status(401).json({message: "Not logged in"});
           // next('Unauthorized');
         } 
@@ -111,11 +117,12 @@ export default (app, router, passport) => {
   // Also pass in auth & admin middleware and Passport instance
   authRoutes(app, router, passport, auth, admin, paid);
 
-  todoRoutes(app, router);
-  recipeRoutes(app, router);
+  // todoRoutes(app, router);
+  // recipeRoutes(app, router);
 
   // #### RESTful API Routes
 
+  notebookRoutes(app, router, auth, admin, paid);
   partRoutes(app, router, auth, admin, paid);
   documentRoutes(app, router, auth, admin, paid);
   sectionRoutes(app, router, auth, admin, paid);

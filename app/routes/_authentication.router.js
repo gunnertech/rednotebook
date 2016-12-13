@@ -80,9 +80,9 @@ export default (app, router, passport, auth, admin, paid) => {
 
       // If no user is returned...
       if (!user) {
-
+        console.log(info);
         // Set HTTP status code `401 Unauthorized`
-        res.status(401).send({});
+        return res.status(401).send({});
 
         // Return the info message
         // return next(info.loginMessage);
@@ -97,14 +97,14 @@ export default (app, router, passport, auth, admin, paid) => {
 
         var recurlyAccountCode = user.recurlyAccountCode || 'recurly_1_11';
 
+        console.log(recurlyAccountCode)
+
         recurly.subscriptions.listByAccount(recurlyAccountCode, {}, function(response) {
-          if(typeof(response.data.subscriptions.subscription.length) == 'undefined') {
+          console.log(response.data)
+          if(response.data.subscriptions && typeof(response.data.subscriptions.subscription.length) == 'undefined') {
             user.recurlyAccountStatus = response.data.subscriptions.subscription.state;
             user.save()
             .then(function() {
-              // Set HTTP status code `200 OK`
-              res.status(200);
-
               // Return the user object
               var userInfo = setUserInfo(user);
               res.status(200).json({
@@ -113,7 +113,11 @@ export default (app, router, passport, auth, admin, paid) => {
               });
             });
           } else {
-            console.log(response.data.subscriptions.subscription.length);
+            var userInfo = setUserInfo(user);
+            res.status(200).json({
+              token: 'JWT ' + generateToken(userInfo),
+              user: user
+            });
           }
         });        
       });
@@ -143,11 +147,15 @@ export default (app, router, passport, auth, admin, paid) => {
         // // Return the info message
         // return next(info.signupMessage);
       } else {
-        var userInfo = setUserInfo(user);
-        res.status(201).json({
-          token: 'JWT ' + generateToken(userInfo),
-          user: user
-        });
+        console.log(req.body.state)
+        User.update({_id: user._id}, {$addToSet: {states: req.body.state }})
+        .then(function() {
+          var userInfo = setUserInfo(user);
+          res.status(201).json({
+            token: 'JWT ' + generateToken(userInfo),
+            user: user
+          });
+        })
       }
 
     }) (req, res, next);
@@ -166,16 +174,20 @@ export default (app, router, passport, auth, admin, paid) => {
 
   // Route to get the current user
   // The `auth` middleware was passed in to this function from `routes.js`
-  router.get('/auth/user', paid, (req, res) => {
+  router.get('/auth/user', auth, (req, res) => {
 
     // Send response in JSON to allow disassembly of object by functions
-    res.json(req.user);
+    User.findById(req.user._id).populate('assignments')
+    .then(function(user) {
+      res.json(user);  
+    });
+    
   });
 
   // Route to delete a user. Accepts a url parameter in the form of a
   // username, user email, or mongoose object id.
   // The `admin` Express middleware was passed in from `routes.js`
-  router.delete('/auth/delete/:uid', admin, (req, res) => {
+  router.delete('/auth/delete/:uid', auth, admin, (req, res) => {
 
     User.remove({
 

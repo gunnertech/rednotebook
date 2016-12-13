@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Document from './document.model';
+import Notebook from './notebook.model';
 import Promise from 'bluebird';
 
 let partSchema = new mongoose.Schema({

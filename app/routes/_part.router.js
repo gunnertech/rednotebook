@@ -23,6 +23,7 @@ export default (app, router, auth, admin, paid) => {
   router.route('/part')
     .post(auth, admin, (req, res) => {
       Part.create({
+        notebook: req.body.notebook,
         title: req.body.title,
         position: req.body.position
       })

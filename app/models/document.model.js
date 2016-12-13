@@ -39,9 +39,14 @@ documentSchema.set('toObject', {
 });
 
 documentSchema.pre('save', function (next) {
-	Part.update( {_id: this.part}, { $addToSet: {documents: this._id } } )
-	.then(( (parts) => next() ))
-	.error(( (err) => next(err) ));
+	let self = this;
+	Part.update( {documents: self._id}, { $pullAll: {documents: [self._id] } } )
+	.then(function(parts) {
+		console.log(parts);
+		Part.update( {_id: self.part}, { $addToSet: {documents: self._id } } )
+		.then(( (parts) => next() ))
+		.error(( (err) => next(err) ));
+	})
 });
 
 //WHEN A DOCUMENT IS SAVED, WE NEED TO POTENTIALLY CREATE NEW ASSIGNMENTS FOR IT

@@ -416,10 +416,9 @@ Notebook.count()
 .then((notebook) => {
   if(notebook.parts.length === 0) {
     let parts = [
-      {title: "Folder", position: 1},
-      {title: "Part 1", position: 2},
-      {title: "Part 2", position: 3},
-      {title: "Part 3", position: 4},
+      {title: "Part 1: Then", position: 1},
+      {title: "Part 2: Now", position: 2},
+      {title: "Part 3: Eternity", position: 3},
     ];
 
     return Promise.each(parts, (part) => {

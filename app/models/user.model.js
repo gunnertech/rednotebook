@@ -48,18 +48,30 @@ let userSchema = mongoose.Schema({
     zip: String  
   },
 
+  state: {type: mongoose.Schema.Types.ObjectId, ref:'State'},
   states: [{type: mongoose.Schema.Types.ObjectId, ref:'State'}],
   assignments: [{type: mongoose.Schema.Types.ObjectId, ref:'Assignment'}],
   responses: [{type: mongoose.Schema.Types.ObjectId, ref:'Response'}],
   notifications: [{type: mongoose.Schema.Types.ObjectId, ref:'Notification'}],
   
-  recurlySubscriptionId : { type : String, unique : true },
-  recurlyAccountCode : { type : String, unique : true },
+  recurlySubscriptionId : { type : String },
+  recurlyAccountCode : { type : String },
   recurlyAccountStatus : { type : String, default: 'in_trial', enum : ['active', 'canceled', 'expired', 'future', 'in_trial', 'live', 'past_due'] },
 
   role : { type : String }
 }, {
   timestamps: true
+});
+
+userSchema.pre('save', function (next) {
+  if(this.state) {
+    User.update( {_id: this._id}, { state: null, $addToSet: {states: this.state } } )
+    .then(( () => next() ))
+    .error(( (err) => next(err) ));
+  } else {
+    next();
+  }
+  
 });
 
 userSchema.pre('save', function (next) {
@@ -199,6 +211,7 @@ userSchema.methods.subscribe = function() {
         account_code: self.recurlyAccountCode
       }
     };
+    console.log("I GOT HERE")
     return createSubscription(obj).catch(function(err){ console.log(err.data); });
   });
 };
