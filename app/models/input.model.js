@@ -12,7 +12,7 @@ let inputSchema = new mongoose.Schema({
 		enum: ["File", "Short Text", "Number", "Percentage", "Long Text", "Date"]
 	},
 	choices: {
-		type: [String]
+		type: String
 	},
 	documentUrl: { type: String },
 	allowMultipleChoiceSelections: {

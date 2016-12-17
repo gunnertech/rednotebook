@@ -42,9 +42,8 @@ documentSchema.pre('save', function (next) {
 	let self = this;
 	Part.update( {documents: self._id}, { $pullAll: {documents: [self._id] } } )
 	.then(function(parts) {
-		console.log(parts);
-		Part.update( {_id: self.part}, { $addToSet: {documents: self._id } } )
-		.then(( (parts) => next() ))
+		return Part.update( {_id: self.part}, { $addToSet: {documents: self._id } } )
+		.then( (parts) => { next(); return null; } )
 		.error(( (err) => next(err) ));
 	})
 });
@@ -92,10 +91,10 @@ documentSchema.post('save', function (document) {
 				assignments.forEach(function(assignment) {
 					Notification.create({
 						user: assignment.user,
-						message: "There's been an update to one of your documents.",
+						message: `${document.title} has been updated`,
 						data: {
 							type: "Document",
-							id: document.id
+							id: document._id
 						}
 					})
 					.then(( () => {} ))

@@ -9,6 +9,8 @@ let notificationSchema = new mongoose.Schema({
 	user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
 	message: String,
 	data: Object
+}, {
+  timestamps: true
 });
 
 notificationSchema.methods.url = function() {
@@ -41,7 +43,7 @@ notificationSchema.methods.sendEmail = function() {
 };
 
 notificationSchema.pre('save', function (next) {
-	User.update( {_id: this.user}, { $addToSet: {documents: this._id } } )
+	User.update( {_id: this.user}, { $addToSet: {notifications: this._id } } )
 	.then(( (users) => next() ))
 	.error(( (err) => next(err) ));
 });

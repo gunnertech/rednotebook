@@ -35,7 +35,7 @@ export default (app, router, auth, admin, paid) => {
     })
 
     .get(auth, paid, (req, res) => {
-      Document.find().sort({position: 1})
+      Document.find().sort({position: 1}).populate('sections')
       .then( (documents) => {
         res.json(documents);
       })
@@ -46,7 +46,13 @@ export default (app, router, auth, admin, paid) => {
 
   router.route('/document/:document_id')
     .get(auth, paid, (req, res) => {
-      Document.findOne({'_id': req.params.document_id}).populate(['part','sections','state','assignments'])
+      Document.findOne({'_id': req.params.document_id}).populate(['part','state','assignments'])
+      .populate({
+        path: 'sections',
+        populate: {
+          path: 'inputs'
+        }
+      })
       .then( (document) => {
         res.json(document);
       })

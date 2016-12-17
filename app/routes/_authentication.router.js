@@ -15,8 +15,8 @@
 
 // POST   */api/auth/login*       Route to login
 
-// POST   */api/auth/logout*      Route to logout and redirect to the
 //                                appropriate view
+// POST   */api/auth/logout*      Route to logout and redirect to the
 
 // ## Authentication API object
 
@@ -80,7 +80,6 @@ export default (app, router, passport, auth, admin, paid) => {
 
       // If no user is returned...
       if (!user) {
-        console.log(info);
         // Set HTTP status code `401 Unauthorized`
         return res.status(401).send({});
 
@@ -97,10 +96,8 @@ export default (app, router, passport, auth, admin, paid) => {
 
         var recurlyAccountCode = user.recurlyAccountCode || 'recurly_1_11';
 
-        console.log(recurlyAccountCode)
 
         recurly.subscriptions.listByAccount(recurlyAccountCode, {}, function(response) {
-          console.log(response.data)
           if(response.data.subscriptions && typeof(response.data.subscriptions.subscription.length) == 'undefined') {
             user.recurlyAccountStatus = response.data.subscriptions.subscription.state;
             user.save()
@@ -140,14 +137,12 @@ export default (app, router, passport, auth, admin, paid) => {
 
       // If no user is returned...
       if (!user) {
-        console.log(info)
         // Set HTTP status code `401 Unauthorized`
         res.status(401).json(info);
 
         // // Return the info message
         // return next(info.signupMessage);
       } else {
-        console.log(req.body.state)
         User.update({_id: user._id}, {$addToSet: {states: req.body.state }})
         .then(function() {
           var userInfo = setUserInfo(user);
@@ -177,7 +172,7 @@ export default (app, router, passport, auth, admin, paid) => {
   router.get('/auth/user', auth, (req, res) => {
 
     // Send response in JSON to allow disassembly of object by functions
-    User.findById(req.user._id).populate('assignments')
+    User.findById(req.user._id).populate(['assignments']).populate({path: 'notifications', options: { sort: { 'createdAt': -1 } } })
     .then(function(user) {
       res.json(user);  
     });
