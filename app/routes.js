@@ -22,6 +22,7 @@ import sectionRoutes from './routes/_section.router.js';
 import inputRoutes from './routes/_input.router.js';
 import responseRoutes from './routes/_response.router.js';
 import assignmentRoutes from './routes/_assignment.router.js';
+import notificationRoutes from './routes/_notification.router.js';
 import stateRoutes from './routes/_state.router.js';
 import subscriptionRoutes from './routes/_subscription.router.js';
 import notebookRoutes from './routes/_notebook.router.js';
@@ -128,6 +129,7 @@ export default (app, router, passport) => {
   inputRoutes(app, router, auth, admin, paid);
   responseRoutes(app, router, auth, admin, paid);
   assignmentRoutes(app, router, auth, admin, paid);
+  notificationRoutes(app, router, auth, admin, paid);
   stateRoutes(app, router, auth, admin, paid);
   subscriptionRoutes(app, router, auth, admin, paid);
 	
