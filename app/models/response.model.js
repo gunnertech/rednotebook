@@ -71,9 +71,21 @@ responseSchema.pre('save', function (next) {
 	.error(( (err) => next(err) ));
 });
 
+responseSchema.pre('save', function (next) {
+	User.update( {_id: this.user}, { $addToSet: {responses: this._id } } )
+	.then(( (users) => next() ))
+	.error(( (err) => next(err) ));
+});
+
 responseSchema.pre('remove', function (next) {
 	Input.update( {_id: this.input}, { $pullAll: {responses: [this._id] } } )
 	.then(( (inputs) => next() ))
+	.error(( (err) => next(err) ));
+});
+
+responseSchema.pre('remove', function (next) {
+	User.update( {_id: this.user}, { $pullAll: {responses: [this._id] } } )
+	.then(( (users) => next() ))
 	.error(( (err) => next(err) ));
 });
 

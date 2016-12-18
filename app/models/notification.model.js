@@ -49,14 +49,14 @@ notificationSchema.pre('save', function (next) {
 });
 
 notificationSchema.post('save', function (notification) {
-	notification.sendEmail()
-	.then(function() {
-		console.log(arguments);
-	})
-	.catch(function() {
-		console.log(arguments);
-	})
-	;
+	// notification.sendEmail()
+	// .then(function() {
+	// 	console.log(arguments);
+	// })
+	// .catch(function() {
+	// 	console.log(arguments);
+	// })
+	// ;
 });
 
 export default mongoose.model('Notification', notificationSchema);

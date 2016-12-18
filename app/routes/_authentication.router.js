@@ -172,7 +172,7 @@ export default (app, router, passport, auth, admin, paid) => {
   router.get('/auth/user', auth, (req, res) => {
 
     // Send response in JSON to allow disassembly of object by functions
-    User.findById(req.user._id).populate(['assignments']).populate({path: 'notifications', options: { sort: { 'createdAt': -1 } } })
+    User.findById(req.user._id).populate(['assignments', 'responses']).populate({path: 'notifications', options: { sort: { 'createdAt': -1 } } })
     .then(function(user) {
       res.json(user);  
     });
