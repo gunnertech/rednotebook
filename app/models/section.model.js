@@ -34,9 +34,9 @@ sectionSchema.pre('save', function (next) {
 });
 
 sectionSchema.post('save', function (section) {
-	if(section.repeatable && section.children.length < 200) {
+	if(section.repeatable && section.children.length < 50) {
 		var Section = mongoose.model('Section', sectionSchema);
-		for(var i=1; i<=200; i++) {
+		for(var i=1; i<=50; i++) {
 			var newSection = new Section();
 			newSection.master = section._id;
 			newSection.position = i;
@@ -45,6 +45,38 @@ sectionSchema.post('save', function (section) {
 
 			newSection.save();
 		}
+	}
+});
+
+sectionSchema.post('save', function (section) { //sync all the sections inputs
+	if(section.master) {
+		var Section = mongoose.model('Section', sectionSchema);
+		Section.findById(section.master).populate('inputs')
+		.then(function(section) {
+			section.inputs.forEach(function(input) {
+				Input.findOne({clonedFrom: input._id, section: section._id})
+				.then((clonedInput) => {
+					clonedInput = clonedInput || new Input();
+					if(clonedInput.syncWith(input)) {
+						clonedInput.save();
+					}
+				});
+			});
+		});
+	}
+});
+
+sectionSchema.post('save', function (section) {
+	var Section = mongoose.model('Section', sectionSchema);
+	if(section.children) {
+		Section.find({_id: {$in: section.children } })
+		.then(function(children) {
+			children.forEach((child) => {
+				if(child.syncWith(section)) {
+					child.save();
+				}
+			});
+		});
 	}
 });
 
@@ -75,5 +107,19 @@ sectionSchema.post('save', function (section) {
 	.then( (sections) => console.log(sections) )
 	.error(( (err) => console.log(err) ));
 });
+
+sectionSchema.methods.syncWith = function(section) { 
+	let self = this;
+	var didChange = false;
+
+	['title','description'].forEach((prop) => {
+		if(self[prop] != section[prop]) {
+			didChange = true;
+			self[prop] = section[prop];
+		}
+	});
+
+	return didChange;
+}
 
 export default mongoose.model('Section', sectionSchema);

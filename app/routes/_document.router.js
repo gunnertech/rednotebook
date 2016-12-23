@@ -46,11 +46,20 @@ export default (app, router, auth, admin, paid) => {
 
   router.route('/document/:document_id')
     .get(auth, paid, (req, res) => {
-      Document.findOne({'_id': req.params.document_id}).populate(['part','state','assignments'])
+      Document.findById(req.params.document_id).populate(['part','state','assignments'])
       .populate({
         path: 'sections',
         populate: {
           path: 'inputs'
+        }
+      })
+      .populate({
+        path: 'sections',
+        populate: {
+          path: 'children',
+          populate: {
+            path: 'inputs'
+          }
         }
       })
       .then( (document) => {

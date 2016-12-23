@@ -72,8 +72,9 @@ export default (app, router, auth, admin, paid) => {
 
     .delete(auth, admin, (req, res) => {
 
-      Input.remove({
-        _id : req.params.input_id
+      Input.findById(req.params.input_id)
+      .then( (input) => {
+        return input.remove();
       })
       .then( () => {
         res.status(200).send({});
