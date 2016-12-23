@@ -44,7 +44,6 @@ export default (app, router, passport) => {
   router.use((req, res, next) => {
 
     console.log('I sense a disturbance in the force...'); // DEBUG
-
     // Make sure we go to the next routes and don't stop here...
     next();
   });

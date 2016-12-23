@@ -25,7 +25,12 @@ export default (app, router, auth, admin, paid) => {
   router.route('/response')
     .post(auth, paid, (req, res) => {
       var safeProperties = req.body;
-      Response.create(safeProperties)
+      var response = new Response();
+      
+      _.assign(response, safeProperties);
+      response.encryptionKey = req.headers.encryptionkey;
+      
+      response.save()
       .then( (response) => {
         res.json(response);
       })
@@ -60,6 +65,7 @@ export default (app, router, auth, admin, paid) => {
       .then( (response) => {
         var safeProperties = req.body;
         _.assign(response, safeProperties);
+        response.encryptionKey = req.headers.encryptionkey;
         return response.save().then( () => response );
       })
       .then( (response) => {

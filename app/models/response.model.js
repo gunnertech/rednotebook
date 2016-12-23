@@ -18,12 +18,12 @@ responseSchema.virtual('encryptionKey').get(function() {
   return this._encryptionKey;
 });
 
-responseSchema.virtual('encryptionKey').set(function(sendNotification) {
+responseSchema.virtual('encryptionKey').set(function(encryptionKey) {
   return this._encryptionKey = encryptionKey;
 });
 
 responseSchema.virtual('decryptedValue').get(function() {
-	var encryptionKey = (this._encryptionKey||"TEST");
+	var encryptionKey = this._encryptionKey;
 	if(!this.isEncrypted || !encryptionKey) {
 		return this.value;
 	}
