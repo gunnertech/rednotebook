@@ -1,3 +1,9 @@
+# Prerequisits
+
+1. NVM
+2. Brew
+
+
 # Setup
 
 1. Get access to the repo
@@ -7,6 +13,7 @@
 4. ```npm install -g gulp```
 5. ```npm install```
 6. create a .env file in the project root and add the following variables
+7. ```brew install awsebcli```
 
 ````
 RECURLY_API_KEY='xxxx'
@@ -26,3 +33,5 @@ Contact another developer to get the values for xxx
 
 # Operation
 1. ```gulp serve```
+
+# Deploying
