@@ -44,6 +44,9 @@ export default (app, router, passport) => {
   // ### Express Middlware to use for all requests
   router.use((req, res, next) => {
 
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, EncryptionKey");
+
     console.log('I sense a disturbance in the force...'); // DEBUG
     // Make sure we go to the next routes and don't stop here...
     next();
