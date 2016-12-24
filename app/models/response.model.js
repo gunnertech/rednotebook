@@ -54,7 +54,7 @@ responseSchema.pre('save', function (next) {
 	.then(function(input) {
 		if(input.requiresEncryption) { 
 			var algorithm = 'aes-256-ctr';
-			var cipher = crypto.createCipher(algorithm, (self._encryptionKey||"TEST"));
+			var cipher = crypto.createCipher(algorithm, self._encryptionKey);
 			var crypted = cipher.update(self.value,'utf8','hex')
 			
 			crypted += cipher.final('hex');

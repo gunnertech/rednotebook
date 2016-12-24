@@ -12,6 +12,7 @@
   "license": "MIT",
   "scripts": {},
   "dependencies": {
+    "aws-sdk": "^2.7.19",
     "bcrypt-nodejs": "0.0.3",
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.1",
@@ -25,6 +26,8 @@
     "method-override": "^2.3.6",
     "moment": "^2.16.0",
     "mongoose": "^4.4.19",
+    "multer": "^1.2.1",
+    "multer-s3": "^2.5.0",
     "node-env-file": "^0.1.8",
     "node-recurly": "git+https://github.com/cgerrior/node-recurly.git",
     "nodemailer": "^2.6.4",

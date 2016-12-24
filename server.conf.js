@@ -85,11 +85,11 @@ app.use(cookieParser());
 // ## Get all data/stuff of the body (POST) parameters
 
 // Parse application/json
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 // Parse application/vnd.api+json as json
 app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
 // Parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 // Override with the X-HTTP-Method-Override header in the request. Simulate DELETE/PUT
 app.use(methodOverride('X-HTTP-Method-Override'));
