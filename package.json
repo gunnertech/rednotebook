@@ -12,8 +12,9 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf build && mkdir build",
-    "build-server": "babel -d ./build ./server -s",
-    "build": "npm run clean && npm run build-server"
+    "build-server": "./node_modules/babel-cli/bin/babel.js -d ./build ./ -s --ignore node_modules",
+    "build": "npm run clean && npm run build-server",
+    "start": "node ./build/server.conf.js"
   },
   "dependencies": {
     "aws-sdk": "^2.7.19",
