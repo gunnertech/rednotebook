@@ -10,7 +10,11 @@
   "author": "Cody Swann <cody@gunnertech.com>",
   "homepage": "https://github.com/gunnertech/rednotebook",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "clean": "rm -rf build && mkdir build",
+    "build-server": "babel -d ./build ./server -s",
+    "build": "npm run clean && npm run build-server"
+  },
   "dependencies": {
     "aws-sdk": "^2.7.19",
     "bcrypt-nodejs": "0.0.3",

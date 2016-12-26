@@ -76,3 +76,6 @@ npm-debug.log
 .sass-cache
 *.swp
 .env
+
+build/
+.elasticbeanstalk/

@@ -74,10 +74,15 @@ import passportConf from './config/passport.conf.js';
 // Pass Passport configuration our PassportJS instance
 passportConf(passport);
 
+
+var basePath = "./build/";
 if (process.env.NODE_ENV === 'development' ||
-    process.env.NODE_ENV === 'test')
+    process.env.NODE_ENV === 'test') {
   // Log every request to the console
   app.use(morgan('dev'));
+
+  basePath = "./app/";
+}
 
 // Read cookies (needed for authentication)
 app.use(cookieParser());
@@ -96,11 +101,11 @@ app.use(methodOverride('X-HTTP-Method-Override'));
 // Set the static files location /public/img will be /img for users
 app.use(express.static(__dirname + '/dist'));
 
-import Notebook from './app/models/notebook.model';
-import Part from './app/models/part.model';
-import User from './app/models/user.model';
-import Document from './app/models/document.model';
-import State from './app/models/state.model';
+import Notebook from (basePath + 'models/notebook.model');
+import Part from (basePath + 'models/part.model');
+import User from (basePath + 'models/user.model');
+import Document from (basePath + 'models/document.model');
+import State from (basePath + 'models/state.model');
 
 // import Recurly from 'node-recurly';
 
@@ -458,7 +463,7 @@ let router = express.Router();
 
 // Load our application API routes
 // Pass in our express and express router instances
-import routes from './app/routes';
+import routes from (basePath + 'routes');
 
 // Pass in instances of the express app, router, and passport
 routes(app, router, passport);
