@@ -27,10 +27,6 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
-var _morgan = require('morgan');
-
-var _morgan2 = _interopRequireDefault(_morgan);
-
 var _bodyParser = require('body-parser');
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
@@ -129,7 +125,11 @@ var io = _socket2.default.listen(server);
 // Load Mongoose for MongoDB interactions
 
 _mongoose2.default.Promise = _bluebird2.default;
+
 // Log requests to the console (Express 4)
+if (process.env.NODE_ENV == 'development') {
+    var morgan = require('morgan');
+}
 
 // Pull information from HTML POST (express 4)
 
@@ -162,7 +162,7 @@ var port = process.env.PORT || 8080;
 
 if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')
     // Log every request to the console
-    app.use((0, _morgan2.default)('dev'));
+    app.use(morgan('dev'));
 
 // Read cookies (needed for authentication)
 app.use((0, _cookieParser2.default)());
