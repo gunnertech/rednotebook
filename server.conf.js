@@ -43,9 +43,10 @@ import Promise from 'bluebird';
 mongoose.Promise = Promise;
 
 // Log requests to the console (Express 4)
-if (process.env.NODE_ENV == 'development') {
-var morgan = require('morgan');
-}
+//if (process.env.NODE_ENV == 'development') {
+//var morgan = require('morgan');
+import morgan from 'morgan';
+//}
 
 // Pull information from HTML POST (express 4)
 import bodyParser from 'body-parser';
