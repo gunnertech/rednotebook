@@ -77,5 +77,4 @@ npm-debug.log
 *.swp
 .env
 
-build/
 .elasticbeanstalk/

@@ -41,8 +41,13 @@ let io = socketio.listen(server);
 import mongoose from 'mongoose';
 import Promise from 'bluebird';
 mongoose.Promise = Promise;
+
 // Log requests to the console (Express 4)
-import morgan from 'morgan';
+//if (process.env.NODE_ENV == 'development') {
+//var morgan = require('morgan');
+//import morgan from 'morgan';
+//}
+
 // Pull information from HTML POST (express 4)
 import bodyParser from 'body-parser';
 // Simulate DELETE and PUT (Express 4)
@@ -74,10 +79,10 @@ import passportConf from './config/passport.conf.js';
 // Pass Passport configuration our PassportJS instance
 passportConf(passport);
 
-if (process.env.NODE_ENV === 'development' ||
-    process.env.NODE_ENV === 'test')
+//if (process.env.NODE_ENV === 'development' ||
+ //   process.env.NODE_ENV === 'test')
   // Log every request to the console
-  app.use(morgan('dev'));
+  //app.use(morgan('dev'));
 
 // Read cookies (needed for authentication)
 app.use(cookieParser());
