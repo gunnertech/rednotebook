@@ -26,6 +26,8 @@ import Recurly from 'node-recurly';
 import authConfig from '../../config/auth';
 import jwt from 'jsonwebtoken'; 
 
+import _ from 'lodash';
+
 function generateToken(user){
   return jwt.sign(user, authConfig.secret, {
     expiresIn: 10080
@@ -182,6 +184,37 @@ export default (app, router, passport, auth, admin, paid) => {
       });
       
       res.json(user);  
+    });
+    
+  });
+
+
+  router.put('/auth/user', auth, (req, res) => {
+
+    // Send response in JSON to allow disassembly of object by functions
+    User.findById(req.user._id)
+    .then( (user) => {
+    	
+    	if(req.body.password) {
+    		req.body.password = user.generateHash(req.body.password);
+    	} else {
+    		delete req.body.password;
+    	}
+
+      var safeProperties = req.body;
+
+      _.assign(user, safeProperties);
+      
+      user.local.username = user.local.username.toLowerCase();
+      user.local.email = user.local.email.toLowerCase();
+
+      return user.save().then( () => user );
+    })
+    .then( (user) => {
+      res.json(user);
+    })
+    .error( (err) => {
+      res.status(500).send(err);
     });
     
   });

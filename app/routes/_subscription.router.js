@@ -28,6 +28,7 @@ export default (app, router, auth, admin, paid) => {
         return user.subscribe();
       })
       .then( (subscription) => {
+        console.log(subscription);
         res.json(subscription);
       })
       .error( (err) => {

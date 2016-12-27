@@ -65,7 +65,7 @@ let userSchema = mongoose.Schema({
 
 userSchema.pre('save', function (next) {
   if(this.state) {
-    User.update( {_id: this._id}, { state: null, $addToSet: {states: this.state } } )
+    mongoose.model('User', userSchema).update( {_id: this._id}, { state: null, $addToSet: {states: this.state } } )
     .then(( () => next() ))
     .error(( (err) => next(err) ));
   } else {
@@ -167,11 +167,37 @@ userSchema.methods.subscribe = function() {
   var createSubscription = Promise.promisify(recurly.subscriptions.create);
   var createAccount = Promise.promisify(recurly.accounts.create);
   var getAccount = Promise.promisify(recurly.accounts.get);
+  var updateAccount = Promise.promisify(recurly.accounts.update);
   var self = this;
 
   return getAccount(self.recurlyAccountCode)
   .then(function(response) {
-    return response;
+    return updateAccount(self.recurlyAccountCode, {
+      first_name: self.billingInfo.firstName,
+      last_name: self.billingInfo.lastName,
+      email: self.local.email,
+      billing_info: {
+        first_name: self.billingInfo.firstName,
+        last_name: self.billingInfo.lastName,
+        country: 'US',
+        city: self.billingInfo.city,
+        state: self.billingInfo.state,
+        zip: self.billingInfo.zip,
+        address1: self.billingInfo.address1,
+        address2: self.billingInfo.address2,
+        number: self.billingInfo.creditCardNumber,
+        month: self.billingInfo.creditCardExpirationMonth,
+        year: self.billingInfo.creditCardExpirationYear
+      },
+      address: {
+        country: 'US',
+        city: self.billingInfo.city,
+        state: self.billingInfo.state,
+        zip: self.billingInfo.zip,
+        address1: self.billingInfo.address1,
+        address2: self.billingInfo.address2
+      }
+    });
   })
   .catch(function(err) {
     return createAccount({
@@ -211,7 +237,7 @@ userSchema.methods.subscribe = function() {
         account_code: self.recurlyAccountCode
       }
     };
-    console.log("I GOT HERE")
+
     return createSubscription(obj).catch(function(err){ console.log(err.data); });
   });
 };
