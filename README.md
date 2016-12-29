@@ -1,4 +1,4 @@
-# Prerequisits
+# Prerequisites
 
 1. NVM
 2. Brew
@@ -35,3 +35,5 @@ Contact another developer to get the values for xxx
 1. ```gulp serve```
 
 # Deploying
+1. ``` npm run build ```
+2. ``` git add . ; git commit -m "Heroku Build"; git push heroku master ```
