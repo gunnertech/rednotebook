@@ -45,7 +45,7 @@ export default (app, router, passport) => {
   router.use((req, res, next) => {
 
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "PUT");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, EncryptionKey");
 
     console.log('I sense a disturbance in the force...'); // DEBUG

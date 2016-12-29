@@ -47,6 +47,7 @@ exports.default = function (mongoose) {
 
   // Connect to our MongoDB database using the MongoDB
   // connection URI from our predefined environment variable
+  console.log(process.env.MONGO_URI);
   mongoose.connect(process.env.MONGO_URI, function (error) {
 
     if (error) throw error;

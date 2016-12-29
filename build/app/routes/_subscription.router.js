@@ -21,6 +21,7 @@ exports.default = function (app, router, auth, admin, paid) {
     }).then(function (user) {
       return user.subscribe();
     }).then(function (subscription) {
+      console.log(subscription);
       res.json(subscription);
     }).error(function (err) {
       res.status(500).send(err);

@@ -20,9 +20,17 @@ var _jsonwebtoken = require('jsonwebtoken');
 
 var _jsonwebtoken2 = _interopRequireDefault(_jsonwebtoken);
 
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// ```
+function generateToken(user) {
+  return _jsonwebtoken2.default.sign(user, _auth2.default.secret, {
+    expiresIn: 10080
+  });
+} // ```
 // _authentication.router.js
 // (c) 2016 David Newman
 // david.r.niciforovic@gmail.com
@@ -45,11 +53,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // ## Authentication API object
 
 // Load user model
-function generateToken(user) {
-  return _jsonwebtoken2.default.sign(user, _auth2.default.secret, {
-    expiresIn: 10080
-  });
-}
+
 
 function setUserInfo(user) {
   return {
@@ -191,6 +195,34 @@ exports.default = function (app, router, passport, auth, admin, paid) {
       });
 
       res.json(user);
+    });
+  });
+
+  router.put('/auth/user', auth, function (req, res) {
+
+    // Send response in JSON to allow disassembly of object by functions
+    _userModel2.default.findById(req.user._id).then(function (user) {
+
+      if (req.body.password) {
+        req.body.password = user.generateHash(req.body.password);
+      } else {
+        delete req.body.password;
+      }
+
+      var safeProperties = req.body;
+
+      _lodash2.default.assign(user, safeProperties);
+
+      user.local.username = user.local.username.toLowerCase();
+      user.local.email = user.local.email.toLowerCase();
+
+      return user.save().then(function () {
+        return user;
+      });
+    }).then(function (user) {
+      res.json(user);
+    }).error(function (err) {
+      res.status(500).send(err);
     });
   });
 
