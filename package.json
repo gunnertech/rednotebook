@@ -14,8 +14,7 @@
     "clean": "rm -rf build && mkdir build",
     "build-server": "./node_modules/babel-cli/bin/babel.js -d ./build ./",
     "build": "npm run clean && npm run build-server",
-    "start": "node ./build/server.conf.js",
-    "deploy-prod": "npm run build; eb deploy rnb-production"
+    "start": "node ./build/server.conf.js"
   },
   "dependencies": {
     "aws-sdk": "^2.7.19",
