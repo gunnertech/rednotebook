@@ -148,14 +148,14 @@ import State from './app/models/state.model';
 // });
 
 
-User.findOne({'local.email': 'dougwett@gmail.com'})
+User.findOne({'local.email': 'dpjewett@gmail.com'})
 .then( (user) => {
   if(!user) {
     let newUser = new User();
     newUser.role = 'admin';
     newUser.local.username = "dougj".toLowerCase();
-    newUser.local.email = "dougwett@gmail.com".toLowerCase();
-    newUser.local.password = newUser.generateHash(process.env.ADMIN_PASSWORD || "Changemenowplease1!!");
+    newUser.local.email = "dpjewett@gmail.com".toLowerCase();
+    newUser.local.password = newUser.generateHash(process.env.ADMIN_PASSWORD);
 
     return newUser.save();
   } else {

@@ -79,7 +79,6 @@ export default (passport) => {
 
   // ## Serialize User
   passport.serializeUser((user, done) => {
-    console.log(user);
 
     if(!user) {
       done(null, null);

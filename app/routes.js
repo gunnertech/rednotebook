@@ -34,6 +34,7 @@ import notebookRoutes from './routes/_notebook.router.js';
 import User from './models/user.model.js';
 
 import passport from 'passport';
+import basicAuth from 'basic-auth';
 
 var jwtAuth = passport.authenticate('jwt-login', {session: false});
 
@@ -62,15 +63,48 @@ export default (app, router, passport) => {
       console.log("Let's try JWT");
       passport.authenticate('jwt-login', {session: false}, (err, user, info) => {
         if (err) { 
-          console.log(err);
           next(err);
         } else if(user) {
           console.log("Authenticated via jwt");
           req.user = user;
           next();
         } else {
-          res.status(401).json({message: "Not logged in"});
-          // next('Unauthorized');
+          /// let's try basic auth!
+          function unauthorized(res) {
+            if (req.accepts('html, json') === 'json') {
+              res.status(401).json({message: "Not logged in"});
+            } else {
+              res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+              return res.sendStatus(401);
+            }
+            
+          };
+
+          var u = basicAuth(req);
+
+          if (!u || !u.name || !u.pass) {
+            return unauthorized(res);
+          };
+
+          User.findOne({
+            $or : [
+
+              { 'local.username' : u.name },
+
+              { 'local.email' : u.name }
+            ]
+          })
+          .then(function(user) {
+            if (!user || !user.validPassword(u.pass)) {
+              return unauthorized(res);
+            } else {
+              req.user = user;
+              return next();  
+            }
+          })
+          .error(function() {
+            return unauthorized(res);
+          });
         } 
       })(req, res, next);
     }
@@ -125,7 +159,6 @@ export default (app, router, passport) => {
   // recipeRoutes(app, router);
 
   // #### RESTful API Routes
-
   notebookRoutes(app, router, auth, admin, paid);
   partRoutes(app, router, auth, admin, paid);
   documentRoutes(app, router, auth, admin, paid);
