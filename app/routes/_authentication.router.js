@@ -169,6 +169,51 @@ export default (app, router, passport, auth, admin, paid) => {
     res.sendStatus(401);
   });
 
+  router.post('/auth/user/requestResetToken', (req, res) => {
+    if (!req.body.email) return res.status(400).json({ name: "No Email", message: "You must enter an email address." });
+
+    User.findOne({'local.email': req.body.email})
+    .then((user) => {
+      if(!user) {
+        return res.status(404).json({ name: "Not Found", message: "There was no uwer found with that email address"});
+      }
+
+      return user.sendPasswordResetEmail()
+      .then(() => {
+        return res.status(200).json({});
+      });
+    });
+  });
+
+  router.post('/auth/user/resetPassword', (req, res) => {
+    User.findOne({'local.email': req.body.email})
+    .then((user) => {
+
+      // Check if the token is correct
+      if (!user.passwordResetToken || user.passwordResetToken !== req.body.passwordResetToken) {
+        return res.status(400).json({ message: "That token was not valid. Please try again.", name: "Invalid Token" });
+      }
+
+      // Check if token is expired
+      var expires = new Date().setHours(new Date().getHours() - 2);
+
+      if (user.passwordResetTokenCreatedAt.getTime() <= expires)
+        return res.badRequest({ token: "expired" });
+
+      // Check if password has been provided
+      if (!req.body.password || req.body.password.length < 6)
+        return res.status(400).json({ name: 'Invalid Password!', message: "Must Provide a new Password at least 6 characters long" });
+
+      // Update user with new password
+      user.password = req.body.password;
+
+      return user.save()
+      .then(() => {
+        return res.json(200, user.toJSON());
+      });
+    });
+  })
+
   // Route to get the current user
   // The `auth` middleware was passed in to this function from `routes.js`
   router.get('/auth/user', auth, (req, res) => {

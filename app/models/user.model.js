@@ -22,6 +22,9 @@ import Assignment from './assignment.model';
 import Recurly from 'node-recurly';
 import Promise from 'bluebird';
 
+import uuid from 'node-uuid';
+import sendgrid from 'sendgrid';
+
 let recurly = new Recurly({
   API_KEY:      process.env.RECURLY_API_KEY,
   SUBDOMAIN:    process.env.RECURLY_ACCOUNT_NAME,
@@ -58,6 +61,9 @@ let userSchema = mongoose.Schema({
   recurlyAccountCode : { type : String },
   recurlyAccountStatus : { type : String, default: 'in_trial', enum : ['active', 'canceled', 'expired', 'future', 'in_trial', 'live', 'past_due'] },
 
+  passwordResetToken: String,
+  passwordResetTokenCreatedAt: Date,
+
   role : { type : String }
 }, {
   timestamps: true
@@ -71,6 +77,18 @@ userSchema.pre('save', function (next) {
   } else {
     next();
   }
+  
+});
+
+userSchema.pre('save', function (next) {
+  if (this.passwordResetToken && !this.password) {
+    this.passwordResetTokenCreatedAt = new Date();
+  } else if (this.password && this.passwordResetTokenCreatedAt) {
+    this.passwordResetTokenCreatedAt = new Date();
+    this.local.password = this.generateHash(this.password);
+  }
+
+  next();
   
 });
 
@@ -162,6 +180,52 @@ userSchema.methods.generateHash = function(password) {
 
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 };
+
+userSchema.methods.generatePasswordResetToken = function() {
+  this.passwordResetToken = uuid.v4();
+  return this.save();
+};
+
+userSchema.methods.sendPasswordResetEmail = function() {
+  return this.generatePasswordResetToken()
+  .then(() => {
+    var url = process.env.NODE_ENV == "production" ? 'http://com-gunnertech-rednotebook-production-client.s3-website-us-west-2.amazonaws.com/' : 'http://localhost:8100';
+
+    var body = "Please open the app and when prompted, paste this code: " + this.passwordResetToken + "\n\r\n\r";
+
+    body += "The code will expire in 2 hours."
+    
+    return this.sendEmail("Reset your Red Notebook password", body);
+  });
+};
+
+userSchema.methods.sendEmail = function(subject, body) {
+  var sg = sendgrid(process.env.SENDGRID_API_KEY)
+
+  var helper = sendgrid.mail;
+  var from_email = new helper.Email("no-reply@rednotebook.com");
+  var to_email = new helper.Email(this.local.email);
+  var content = new helper.Content("text/plain", body);
+  var mail = new helper.Mail(from_email, subject, to_email, content);
+
+  var requestBody = mail.toJSON();
+
+  var request = sg.emptyRequest();
+  request.method = 'POST';
+  request.path = '/v3/mail/send';
+  request.body = requestBody;
+
+  return new Promise((resolve, reject) => {
+    sg.API(request, function (error, response) {
+      if (error) {
+        return reject(error);
+      }
+
+      return resolve(response);
+    });
+  });
+};
+
 
 userSchema.methods.subscribe = function() {
   var createSubscription = Promise.promisify(recurly.subscriptions.create);

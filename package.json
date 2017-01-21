@@ -35,11 +35,13 @@
     "multer-s3": "^2.5.0",
     "node-env-file": "^0.1.8",
     "node-recurly": "git+https://github.com/cgerrior/node-recurly.git",
+    "node-uuid": "^1.4.7",
     "nodemailer": "^2.6.4",
     "passport": "^0.3.2",
     "passport-jwt": "^2.2.1",
     "passport-local": "^1.0.0",
     "pdfkit": "^0.8.0",
+    "sendgrid": "^4.7.1",
     "socket.io": "^1.7.1"
   },
   "devDependencies": {
