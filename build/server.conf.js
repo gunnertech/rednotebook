@@ -224,13 +224,13 @@ app.use(_express2.default.static(__dirname + '/dist'));
 // });
 
 
-_user2.default.findOne({ 'local.email': 'dougwett@gmail.com' }).then(function (user) {
+_user2.default.findOne({ 'local.email': 'dpjewett@gmail.com' }).then(function (user) {
     if (!user) {
         var newUser = new _user2.default();
         newUser.role = 'admin';
         newUser.local.username = "dougj".toLowerCase();
-        newUser.local.email = "dougwett@gmail.com".toLowerCase();
-        newUser.local.password = newUser.generateHash(process.env.ADMIN_PASSWORD || "Changemenowplease1!!");
+        newUser.local.email = "dpjewett@gmail.com".toLowerCase();
+        newUser.local.password = newUser.generateHash(process.env.ADMIN_PASSWORD);
 
         return newUser.save();
     } else {

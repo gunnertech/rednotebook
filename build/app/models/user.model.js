@@ -28,6 +28,14 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
+var _nodeUuid = require('node-uuid');
+
+var _nodeUuid2 = _interopRequireDefault(_nodeUuid);
+
+var _sendgrid = require('sendgrid');
+
+var _sendgrid2 = _interopRequireDefault(_sendgrid);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // ```
@@ -83,6 +91,9 @@ var userSchema = _mongoose2.default.Schema({
   recurlyAccountCode: { type: String },
   recurlyAccountStatus: { type: String, default: 'in_trial', enum: ['active', 'canceled', 'expired', 'future', 'in_trial', 'live', 'past_due'] },
 
+  passwordResetToken: String,
+  passwordResetTokenCreatedAt: Date,
+
   role: { type: String }
 }, {
   timestamps: true
@@ -98,6 +109,17 @@ userSchema.pre('save', function (next) {
   } else {
     next();
   }
+});
+
+userSchema.pre('save', function (next) {
+  if (this.passwordResetToken && !this.password) {
+    this.passwordResetTokenCreatedAt = new Date();
+  } else if (this.password && this.passwordResetTokenCreatedAt) {
+    this.passwordResetTokenCreatedAt = new Date();
+    this.local.password = this.generateHash(this.password);
+  }
+
+  next();
 });
 
 userSchema.pre('save', function (next) {
@@ -184,6 +206,52 @@ userSchema.virtual('hasValidSubscription').get(function () {
 userSchema.methods.generateHash = function (password) {
 
   return _bcryptNodejs2.default.hashSync(password, _bcryptNodejs2.default.genSaltSync(8), null);
+};
+
+userSchema.methods.generatePasswordResetToken = function () {
+  this.passwordResetToken = _nodeUuid2.default.v4();
+  return this.save();
+};
+
+userSchema.methods.sendPasswordResetEmail = function () {
+  var _this = this;
+
+  return this.generatePasswordResetToken().then(function () {
+    var url = process.env.NODE_ENV == "production" ? 'http://com-gunnertech-rednotebook-production-client.s3-website-us-west-2.amazonaws.com/' : 'http://localhost:8100';
+
+    var body = "Please open the app and when prompted, paste this code: " + _this.passwordResetToken + "\n\r\n\r";
+
+    body += "The code will expire in 2 hours.";
+
+    return _this.sendEmail("Reset your Red Notebook password", body);
+  });
+};
+
+userSchema.methods.sendEmail = function (subject, body) {
+  var sg = (0, _sendgrid2.default)(process.env.SENDGRID_API_KEY);
+
+  var helper = _sendgrid2.default.mail;
+  var from_email = new helper.Email("no-reply@rednotebook.com");
+  var to_email = new helper.Email(this.local.email);
+  var content = new helper.Content("text/plain", body);
+  var mail = new helper.Mail(from_email, subject, to_email, content);
+
+  var requestBody = mail.toJSON();
+
+  var request = sg.emptyRequest();
+  request.method = 'POST';
+  request.path = '/v3/mail/send';
+  request.body = requestBody;
+
+  return new _bluebird2.default(function (resolve, reject) {
+    sg.API(request, function (error, response) {
+      if (error) {
+        return reject(error);
+      }
+
+      return resolve(response);
+    });
+  });
 };
 
 userSchema.methods.subscribe = function () {

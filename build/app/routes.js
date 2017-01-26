@@ -4,6 +4,25 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; // ```
+// routes.js
+// (c) 2015 David Newman
+// david.r.niciforovic@gmail.com
+// routes.js may be freely distributed under the MIT license
+// ```
+
+// */app/routes.js*
+
+// ## Node API Routes
+
+// Define routes for the Node backend
+
+// Load our API routes for user authentication
+
+
+// import todoRoutes from './routes/_todo.router.js';
+// import recipeRoutes from './routes/_recipe.router.js';
+
 var _moment = require('moment');
 
 var _moment2 = _interopRequireDefault(_moment);
@@ -64,24 +83,13 @@ var _passport = require('passport');
 
 var _passport2 = _interopRequireDefault(_passport);
 
+var _basicAuth = require('basic-auth');
+
+var _basicAuth2 = _interopRequireDefault(_basicAuth);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// import todoRoutes from './routes/_todo.router.js';
-// import recipeRoutes from './routes/_recipe.router.js';
-
-// ## Node API Routes
-
-// Define routes for the Node backend
-
-// Load our API routes for user authentication
-var jwtAuth = _passport2.default.authenticate('jwt-login', { session: false }); // ```
-// routes.js
-// (c) 2015 David Newman
-// david.r.niciforovic@gmail.com
-// routes.js may be freely distributed under the MIT license
-// ```
-
-// */app/routes.js*
+var jwtAuth = _passport2.default.authenticate('jwt-login', { session: false });
 
 exports.default = function (app, router, passport) {
 
@@ -106,15 +114,51 @@ exports.default = function (app, router, passport) {
       console.log("Let's try JWT");
       passport.authenticate('jwt-login', { session: false }, function (err, user, info) {
         if (err) {
-          console.log(err);
           next(err);
         } else if (user) {
           console.log("Authenticated via jwt");
           req.user = user;
           next();
         } else {
-          res.status(401).json({ message: "Not logged in" });
-          // next('Unauthorized');
+          var u;
+
+          var _ret = function () {
+            /// let's try basic auth!
+            var unauthorized = function unauthorized(res) {
+              if (req.accepts('html, json') === 'json') {
+                res.status(401).json({ message: "Not logged in" });
+              } else {
+                res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+                return res.sendStatus(401);
+              }
+            };
+
+            ;
+
+            u = (0, _basicAuth2.default)(req);
+
+
+            if (!u || !u.name || !u.pass) {
+              return {
+                v: unauthorized(res)
+              };
+            };
+
+            _userModel2.default.findOne({
+              $or: [{ 'local.username': u.name }, { 'local.email': u.name }]
+            }).then(function (user) {
+              if (!user || !user.validPassword(u.pass)) {
+                return unauthorized(res);
+              } else {
+                req.user = user;
+                return next();
+              }
+            }).error(function () {
+              return unauthorized(res);
+            });
+          }();
+
+          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
         }
       })(req, res, next);
     }
@@ -168,7 +212,6 @@ exports.default = function (app, router, passport) {
   // recipeRoutes(app, router);
 
   // #### RESTful API Routes
-
   (0, _notebookRouter2.default)(app, router, auth, admin, paid);
   (0, _partRouter2.default)(app, router, auth, admin, paid);
   (0, _documentRouter2.default)(app, router, auth, admin, paid);
