@@ -30,6 +30,7 @@ export default (app, router, auth, admin, paid) => {
     .get(auth, paid, (req, res) => {
       Notebook.find().populate({
         path: 'parts',
+        options: { sort: { 'position': 1 } },
         populate: {
           path: 'documents'
         }

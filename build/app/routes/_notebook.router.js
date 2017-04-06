@@ -31,6 +31,7 @@ exports.default = function (app, router, auth, admin, paid) {
   router.route('/notebook').get(auth, paid, function (req, res) {
     _notebook2.default.find().populate({
       path: 'parts',
+      options: { sort: { 'position': 1 } },
       populate: {
         path: 'documents'
       }
