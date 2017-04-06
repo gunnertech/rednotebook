@@ -39,7 +39,6 @@ partSchema.post('save', function (part) {
 			return part.save();
 		})
 	})
-	.then( (parts) => console.log(parts) )
 	.error(( (err) => console.log(err) ));
 });
 

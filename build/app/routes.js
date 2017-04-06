@@ -20,9 +20,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 // Load our API routes for user authentication
 
 
-// import todoRoutes from './routes/_todo.router.js';
-// import recipeRoutes from './routes/_recipe.router.js';
-
 var _moment = require('moment');
 
 var _moment2 = _interopRequireDefault(_moment);
@@ -207,9 +204,6 @@ exports.default = function (app, router, passport) {
   // Pass in our Express app and Router.
   // Also pass in auth & admin middleware and Passport instance
   (0, _authenticationRouter2.default)(app, router, passport, auth, admin, paid);
-
-  // todoRoutes(app, router);
-  // recipeRoutes(app, router);
 
   // #### RESTful API Routes
   (0, _notebookRouter2.default)(app, router, auth, admin, paid);

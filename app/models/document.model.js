@@ -119,7 +119,6 @@ documentSchema.post('save', function (document) {
 			return document.save();
 		})
 	})
-	.then( (documents) => console.log(documents) )
 	.error(( (err) => console.log(err) ));
 });
 

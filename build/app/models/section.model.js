@@ -118,8 +118,6 @@ sectionSchema.post('save', function (section) {
 			section.position++;
 			return section.save();
 		});
-	}).then(function (sections) {
-		return console.log(sections);
 	}).error(function (err) {
 		return console.log(err);
 	});

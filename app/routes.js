@@ -28,9 +28,6 @@ import stateRoutes from './routes/_state.router.js';
 import subscriptionRoutes from './routes/_subscription.router.js';
 import notebookRoutes from './routes/_notebook.router.js';
 
-// import todoRoutes from './routes/_todo.router.js';
-// import recipeRoutes from './routes/_recipe.router.js';
-
 import User from './models/user.model.js';
 
 import passport from 'passport';
@@ -154,9 +151,6 @@ export default (app, router, passport) => {
   // Pass in our Express app and Router.
   // Also pass in auth & admin middleware and Passport instance
   authRoutes(app, router, passport, auth, admin, paid);
-
-  // todoRoutes(app, router);
-  // recipeRoutes(app, router);
 
   // #### RESTful API Routes
   notebookRoutes(app, router, auth, admin, paid);

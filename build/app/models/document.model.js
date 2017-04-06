@@ -148,8 +148,6 @@ documentSchema.post('save', function (document) {
 			document.position++;
 			return document.save();
 		});
-	}).then(function (documents) {
-		return console.log(documents);
 	}).error(function (err) {
 		return console.log(err);
 	});

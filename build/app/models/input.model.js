@@ -152,8 +152,6 @@ inputSchema.post('save', function (input) {
 			input.position++;
 			return input.save();
 		});
-	}).then(function (inputs) {
-		return console.log(inputs);
 	}).error(function (err) {
 		return console.log(err);
 	});

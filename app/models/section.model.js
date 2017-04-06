@@ -104,7 +104,6 @@ sectionSchema.post('save', function (section) {
 			return section.save();
 		})
 	})
-	.then( (sections) => console.log(sections) )
 	.error(( (err) => console.log(err) ));
 });
 

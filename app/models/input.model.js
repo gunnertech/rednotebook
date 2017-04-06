@@ -142,7 +142,6 @@ inputSchema.post('save', function (input) {
 			return input.save();
 		})
 	})
-	.then( (inputs) => console.log(inputs) )
 	.error(( (err) => console.log(err) ));
 });
 

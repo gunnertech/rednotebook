@@ -63,8 +63,6 @@ partSchema.post('save', function (part) {
 			part.position++;
 			return part.save();
 		});
-	}).then(function (parts) {
-		return console.log(parts);
 	}).error(function (err) {
 		return console.log(err);
 	});
