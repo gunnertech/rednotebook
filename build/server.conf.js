@@ -47,6 +47,10 @@ var _expressSession = require('express-session');
 
 var _expressSession2 = _interopRequireDefault(_expressSession);
 
+var _cookieSession = require('cookie-session');
+
+var _cookieSession2 = _interopRequireDefault(_cookieSession);
+
 var _base = require('./sockets/base');
 
 var _base2 = _interopRequireDefault(_base);
@@ -447,13 +451,19 @@ _notebook2.default.count().then(function (count) {
 // ## Passport JS
 
 // Session secret
-app.use((0, _expressSession2.default)({
+// app.use(session({
 
-    secret: process.env.SESSION_SECRET,
+//   secret : process.env.SESSION_SECRET,
 
-    resave: true,
+//   resave : true,
 
-    saveUninitialized: true
+//   saveUninitialized : true
+// }));
+
+app.use((0, _cookieSession2.default)({
+    name: 'session',
+    keys: [process.env.SESSION_SECRET],
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
 app.use(_passport2.default.initialize());

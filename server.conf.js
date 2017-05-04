@@ -56,6 +56,7 @@ import methodOverride from 'method-override';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import cookieSession from 'cookie-session';
 
 // # Configuration
 
@@ -442,14 +443,20 @@ Notebook.count()
 // ## Passport JS
 
 // Session secret
-app.use(session({
+// app.use(session({
 
-  secret : process.env.SESSION_SECRET,
+//   secret : process.env.SESSION_SECRET,
 
-  resave : true,
+//   resave : true,
 
-  saveUninitialized : true
-}));
+//   saveUninitialized : true
+// }));
+
+app.use(cookieSession({
+  name: 'session',
+  keys: [process.env.SESSION_SECRET],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 app.use(passport.initialize());
 
