@@ -79,3 +79,7 @@ npm-debug.log
 
 .elasticbeanstalk/
 mongobackup/
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
