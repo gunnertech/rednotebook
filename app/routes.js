@@ -128,6 +128,9 @@ export default (app, router, passport) => {
       var accountStartDate = moment(user && user.createdAt ? user.createdAt : Date.now() ).startOf('day');
       var daysBetween = moment.duration(today.diff(accountStartDate)).days();
 
+      console.log(daysBetween)
+      console.log(user)
+
       if(user.role === 'admin') {
         next();
       } else if(user.recurlyAccountStatus == 'in_trial' && daysBetween > 30) {
