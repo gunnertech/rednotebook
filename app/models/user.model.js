@@ -1,12 +1,3 @@
-// ```
-// user.model.js
-// (c) 2016 David Newman
-// david.r.niciforovic@gmail.com
-// user.model.js may be freely distributed under the MIT license
-// ```
-
-// */app/models/user.model.js*
-
 // ## User Model
 
 // Note: MongoDB will autogenerate an _id for each User object created
@@ -16,14 +7,17 @@ import mongoose from 'mongoose';
 
 // Import library to hash passwords
 import bcrypt from 'bcrypt-nodejs';
-import Document from './document.model';
-import Assignment from './assignment.model';
-
+import moment from 'moment';
 import Recurly from 'node-recurly';
 import Promise from 'bluebird';
 
 import uuid from 'node-uuid';
 import sendgrid from 'sendgrid';
+
+import Document from './document.model';
+import Assignment from './assignment.model';
+
+
 
 let recurly = new Recurly({
   API_KEY:      process.env.RECURLY_API_KEY,
@@ -170,7 +164,17 @@ userSchema.virtual('billingInfo.creditCardExpirationYear').get(function() {
 });
 
 userSchema.virtual('hasValidSubscription').get(function() {
-  return this.recurlyAccountStatus == "active" || this.recurlyAccountStatus == "live" || this.recurlyAccountStatus == "in_trial";
+  if(this.recurlyAccountStatus == "active" || this.recurlyAccountStatus == "live") {
+    return true;
+  } else if(this.recurlyAccountStatus == "in_trial") {
+    var today = moment().startOf('day');
+    var accountStartDate = moment(this.createdAt || Date.now() ).startOf('day');
+    var daysBetween = today.diff(accountStartDate,'days');
+
+    return daysBetween < 31;
+  }
+
+  return false;
 });
 
 // ## Methods

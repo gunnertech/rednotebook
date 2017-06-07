@@ -126,10 +126,12 @@ export default (app, router, passport) => {
 
     User.findById(req.user._id, function(err, user) { 
       var accountStartDate = moment(user && user.createdAt ? user.createdAt : Date.now() ).startOf('day');
-      var daysBetween = moment.duration(today.diff(accountStartDate)).days();
+      var daysBetween = today.diff(accountStartDate,'days');
 
+      console.log("~~~~~~~~~~~")
       console.log(daysBetween)
       console.log(user)
+      console.log("~~~~~~~~~~~")
 
       if(user.role === 'admin') {
         next();
